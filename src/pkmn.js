@@ -77,6 +77,14 @@ class PkmnDataRepository {
         return portraitUrl + zeroPad(pkmnId) + "/" + emotion + ".png"
     }
 
+    hasAnimData(pkmnId){
+        return this.animations.has(pkmnId)
+    }
+
+    getAnimData(pkmnId){
+        return this.animations.get(pkmnId)
+    }
+
     async fetchAnimData(pkmnId){
         if (!this.animations.has(pkmnId)){
             const animRoot = spriteUrl + zeroPad(pkmnId)
@@ -132,7 +140,7 @@ class PkmnDataRepository {
             }
             this.animations.set(pkmnId, newAnimationSet)
         }
-        return this.animations.get(pkmnId) //this is a map of animation data
+        return this.getAnimData(pkmnId) //this returns a map
     }
 }
 

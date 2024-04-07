@@ -19,6 +19,7 @@ const activeAnimation = computed(() => {
     }
 })
 
+let intersectionObserver = null
 
 const animations = ref(new Map())
 
@@ -35,9 +36,18 @@ watch(() => props.pkmnId, async (newPkmnId, oldPkmnId) => {
 })
 
 onMounted(() => {
-    fetchAnimations(props.pkmnId)
+    if (pkmnDataRepository.hasAnimData(props.pkmnId)){
+        animations.value = pkmnDataRepository.getAnimData(props.pkmnId)
+    } else {
+        intersectionObserver = new IntersectionObserver((entries) => {
+            if (entries[0].intersectionRatio <= 0) return;
+            fetchAnimations(props.pkmnId)
+            console.log("loading animation for " + props.pkmnId);
+            intersectionObserver.unobserve(entries[0].target);
+        });
+        intersectionObserver.observe(spriteContainer.value)
+    }
 })
-
 
 
 </script>

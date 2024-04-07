@@ -94,12 +94,6 @@ function openSpritePicker(event, pkmnUid){
     pickerPosition.value = [event.pageX, event.pageY]
 }
 
-function hideSpritePicker() {
-    if (pickerType.value == 'animation') {
-        pickerType.value = '';
-    }
-}
-
 function setDirection(pickDirectionEvent){
     const pkmn = placedPkmn.value.get(pickDirectionEvent.pkmnUid)
     if (pkmn){
