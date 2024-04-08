@@ -101,8 +101,11 @@ function onDragStartHandler(event, pkmnId){
         align-items: center;
         justify-content: center;
         image-rendering: pixelated;
+        flex-grow: 1;
+        /*
         height: 64px;
         width: 64px;
+        */
         overflow: hidden;
     }
     .pkmn-card__id {

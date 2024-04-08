@@ -44,6 +44,7 @@ onMounted(() => {
             fetchAnimations(props.pkmnId)
             console.log("loading animation for " + props.pkmnId);
             intersectionObserver.unobserve(entries[0].target);
+            intersectionObserver = null
         });
         intersectionObserver.observe(spriteContainer.value)
     }

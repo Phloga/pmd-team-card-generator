@@ -41,11 +41,11 @@ function dropHandler(event){
         if (rectData.length > 0){
             const rect = JSON.parse(rectData)
             newPkmn.positionX = event.pageX - rect.width/2 - rootRect.left
-            newPkmn.positionY = event.pageY - rect.height/2 - rootRect.top
+            newPkmn.positionY = event.pageY - rect.height/2 - rootRect.top - window.scrollY
             console.log("rect corrected")
         } else {
             newPkmn.positionX = event.pageX - rootRect.left
-            newPkmn.positionY = event.pageY - rootRect.top
+            newPkmn.positionY = event.pageY - rootRect.top - window.scrollY
         }
         placedPkmn.value.set(newPkmn.uid, newPkmn)
     }
@@ -130,7 +130,7 @@ function setAnimation(pickAnimationEvent){
             </div>
             <div class="team-card__info pmd-font">
                 <div>Team:</div>
-                <input class="pmd-font">
+                <input v-model="teamName" class="pmd-font">
             </div>
         </div>
     </div>
@@ -162,6 +162,8 @@ function setAnimation(pickAnimationEvent){
     z-index: 10;
     width: 100vw;
     height: 100vh;
+    top: 0;
+    left:0;
     background-color: rgba(100,0,200,20%);
 }
 
@@ -192,7 +194,7 @@ function setAnimation(pickAnimationEvent){
     font-family: PKMN-Mystery-Dungeon;
     color: white;
     font-size: 1.5em;
-    width: 6rem;
+    width: 7rem;
 }
 
 
