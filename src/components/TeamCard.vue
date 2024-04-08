@@ -109,6 +109,10 @@ function setAnimation(pickAnimationEvent){
     }
 }
 
+function removeTeamMember(uid){
+    placedPkmn.value.delete(uid)
+}
+
 </script>
 
 <template>
@@ -121,11 +125,12 @@ function setAnimation(pickAnimationEvent){
             </div>
             </template>
             <div class="team-list">
-                <div v-for="[uid, pkmn] in placedPkmn" :key="uid" class="team-list__member">
+                <div v-for="[uid, pkmn] in placedPkmn" :key="uid" class="team-member">
                     <button @click="openEmotionPicker($event, pkmn.uid)" class="clickable_portrait">
                         <PkmnPortrait :pkmnId="pkmn.pkmnId" :emotion="pkmn.emotion"></PkmnPortrait>
                     </button>
                     <input>
+                    <i class="icon-xcross team-member__remove" @click="removeTeamMember(uid)"></i>
                 </div>
             </div>
             <div class="team-card__info pmd-font">
@@ -140,63 +145,16 @@ function setAnimation(pickAnimationEvent){
 </template>
 
 <style>
-.team-card__info {
-    position: absolute;
-    right: 2%;
-    top: 2%;
+
+
+.icon-xcross {
+    mask-image: url('../assets/icon/xmark-solid.svg');
+    background-color: var(--color-text);
+    mask-repeat: no-repeat;
+    display: block;
+    height: 1rem;
+    width: 1rem;
 }
-
-.team-card__info input {
-    border: none;
-    background: rgb(0,0,0,25%);
-    font-size: 1.5rem;
-} 
-
-.pmd-font {
-    font-family: 'PKMN-Mystery-Dungeon';
-    color: white;
-}
-
-.background-overlay{
-    position:fixed;
-    z-index: 10;
-    width: 100vw;
-    height: 100vh;
-    top: 0;
-    left:0;
-    background-color: rgba(100,0,200,20%);
-}
-
-.clickable_portrait {
-    border:none;
-    background: none;
-    margin: 0;
-    padding: 0;
-}
-
-.team-list {
-    position: relative;
-    display: flex;
-    flex-flow: column nowrap;
-    padding: 20px;
-}
-
-.team-list__member {
-    display: flex;
-    flex-flow: row nowrap;
-    margin-top: 10px;
-    margin-bottom: 10px; 
-}
-
-.team-list__member input {
-    background-color: rgba(0,0,0,33%);
-    border: none;
-    font-family: PKMN-Mystery-Dungeon;
-    color: white;
-    font-size: 1.5em;
-    width: 7rem;
-}
-
 
 .team-card {
     background-repeat: no-repeat;
@@ -220,6 +178,73 @@ function setAnimation(pickAnimationEvent){
     width: 100%;
     height: 100%;
 }
+
+.team-card__info {
+    position: absolute;
+    right: 2%;
+    top: 2%;
+}
+
+.team-card__info input {
+    border: none;
+    background: rgb(0,0,0,25%);
+    font-size: 1.5rem;
+} 
+
+.background-overlay{
+    position:fixed;
+    z-index: 10;
+    width: 100vw;
+    height: 100vh;
+    top: 0;
+    left:0;
+    background-color: rgba(100,0,200,20%);
+}
+
+.clickable_portrait {
+    border:none;
+    background: none;
+    margin: 0;
+    padding: 0;
+}
+
+.team-list {
+    position: relative;
+    display: flex;
+    flex-flow: column nowrap;
+    padding: 20px;
+    overflow: hidden;
+    width: 40%;
+}
+
+.team-member {
+    position:relative;
+    display: flex;
+    flex-flow: row nowrap;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.team-member input {
+    background-color: rgba(0,0,0,33%);
+    border: none;
+    font-family: PKMN-Mystery-Dungeon;
+    color: white;
+    font-size: 1.5em;
+    min-width: 0;
+}
+
+.team-member__remove {
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+
+.team-member__remove:hover {
+    background-color: red;
+}
+
+
 
 .pkmn-sprite {
     image-rendering: pixelated;

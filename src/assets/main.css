@@ -6,6 +6,12 @@
   justify-content: space-around;
 }
 
+.pmd-font {
+  font-family: 'PKMN-Mystery-Dungeon';
+  color: white;
+}
+
+
 .responsive-row {
   display: flex;
   flex-flow: row wrap;

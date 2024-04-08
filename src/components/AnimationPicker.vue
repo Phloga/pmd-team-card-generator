@@ -45,12 +45,14 @@ function onClick(event, animationName){
     <div class="animation-picker" :style="{'top': positionY+'px', 'left': positionX+'px'}">
         <div>Direction</div>
         <DirectionPicker @pick-direction="pickDirection"></DirectionPicker>
+        <div>Pose</div>
         <div class="animation-dropdown">
             <div v-for="[name, anim] in animations" :key="name" @click="onClick($event, name)">
                 <AnimatedPkmnSprite :pkmnId="pkmn.pkmnId" :animation="name" :direction="0"/>
                 <div> {{ name }}</div>
             </div>
         </div>
+        <input class="frame-input" type="number">
     </div>
 </template>
 
@@ -61,7 +63,7 @@ function onClick(event, animationName){
     flex-flow: column nowrap;
     justify-items: center;
     overflow-y: scroll;
-    max-height: 5rem;
+    max-height: 7rem;
 }
 
 .animation-picker {
