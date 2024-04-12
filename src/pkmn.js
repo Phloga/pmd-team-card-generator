@@ -44,6 +44,7 @@ class PkmnSpritePlacement {
         this.emotion = emotion
         this.animationTileX = 0
         this.animationTileY = 0
+        this.maxAnimationTileX = 0
     }
 
     setDirection(dir){
@@ -95,7 +96,8 @@ class PkmnDataRepository {
         
             const errorNode = animData.querySelector("parsererror");
             if (errorNode) {
-                console.log(errorNode);
+                //console.log(errorNode);
+                throw new Error("Failed to Parse " + animRoot + "/AnimData.xml\nerrorNode:\n" + toString(errorNode))
             }
     
             const anims = animData.getElementsByTagName("Anims")[0].getElementsByTagName("Anim")
@@ -105,25 +107,31 @@ class PkmnDataRepository {
             for (const anim of anims){
                 const name = anim.getElementsByTagName("Name")[0].textContent
                 const copyOfTag = anim.getElementsByTagName("CopyOf")
-        
+
                 if (copyOfTag.length > 0) {
                     newAnimationSet.set(name,
                         {
                             file: null,
                             frameHeight: null,
                             frameWidth: null,
+                            durations: [],
                             copyOf : copyOfTag[0].textContent
                         }
                     )
                 } else {
                     const frameWidth = parseInt(anim.getElementsByTagName("FrameWidth")[0].textContent)
                     const frameHeight = parseInt(anim.getElementsByTagName("FrameHeight")[0].textContent)
+                    const durationsNode = anim.getElementsByTagName("Durations")[0]
+                    const durations = Array.from(durationsNode.getElementsByTagName("Duration")).map((element) => {
+                        return parseInt(element.textContent)
+                    })
                     const file = animRoot + "/" + name + "-Anim.png"
                     newAnimationSet.set(name,
                         {
                             file: file,
                             frameHeight: frameHeight,
                             frameWidth: frameWidth,
+                            durations: durations,
                             copyOf : ""
                         }
                     )
@@ -135,6 +143,7 @@ class PkmnDataRepository {
                     const copyRef = newAnimationSet.get(anim[1].copyOf)
                     anim[1].frameHeight = copyRef.frameHeight
                     anim[1].frameWidth = copyRef.frameWidth
+                    anim[1].durations = copyRef.durations
                     anim[1].file = copyRef.file
                 }
             }

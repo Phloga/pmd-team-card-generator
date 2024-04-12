@@ -11,6 +11,8 @@ const props = defineProps(["pkmn","positionY", "positionX"])
 
 const emit = defineEmits(["pickDirection","pickAnimation", "pickAnimationFrame"])
 
+const frameNumInput = ref(null)
+
 function pickDirection(dir) {
     console.log("pickDirection")
     emit("pickDirection", 
@@ -36,6 +38,24 @@ function onClick(event, animationName){
         animationName : animationName,
         pkmnUid: props.pkmn.uid
     })
+    frameNumInput.value.value = "0"
+}
+
+function setAnimationFrame(event, pkmnUid){
+    let frameNum = parseInt(event.target.value)
+    const activeAnimation = animations.value.get(props.pkmn.animation)
+    if (activeAnimation.durations.length <= frameNum) {
+        frameNum = 0
+        event.target.value = "0"
+    } else if ( frameNum < 0){
+        frameNum = activeAnimation.durations.length-1
+        event.target.value = toString(frameNum)
+    }
+
+    emit("pickAnimationFrame", {
+        pkmnUid: pkmnUid,
+        frameIndex: frameNum
+    })
 }
 
 </script>
@@ -43,20 +63,43 @@ function onClick(event, animationName){
 
 <template>
     <div class="animation-picker" :style="{'top': positionY+'px', 'left': positionX+'px'}">
-        <div>Direction</div>
-        <DirectionPicker @pick-direction="pickDirection"></DirectionPicker>
-        <div>Pose</div>
-        <div class="animation-dropdown">
-            <div v-for="[name, anim] in animations" :key="name" @click="onClick($event, name)">
+        <div class="translucent-panel">
+            <div>Direction</div>
+            <DirectionPicker @pick-direction="pickDirection"></DirectionPicker>
+        </div>
+        <div class="translucent-panel">
+            <div>Pose: [{{ pkmn.animation }}#{{ pkmn.animationTileX }}]</div>
+        </div>
+
+        <div class="animation-dropdown translucent-panel">
+            <div v-for="[name, anim] in animations" :key="name" @click="onClick($event, name)" class="animation-tile">
                 <AnimatedPkmnSprite :pkmnId="pkmn.pkmnId" :animation="name" :direction="0"/>
-                <div> {{ name }}</div>
+                <div class="animation-tile__name"> {{ name }}</div>
             </div>
         </div>
-        <input class="frame-input" type="number">
+        <input ref="frameNumInput" class="frame-input" type="number" @keyup="setAnimationFrame($event, pkmn.uid)" :value="pkmn.animationTileX">
     </div>
 </template>
 
 <style>
+
+.translucent-panel{
+    background-color: rgba(0,0,0,35%);
+    padding-bottom: 0.5rem;
+}
+
+.animation-tile {
+    position:relative;
+    border: 1px solid rgb(50,50,50);
+    margin-top: 1px;
+}
+
+.animation-tile__name {
+    position: absolute;
+    bottom: 0;
+    right: 0.1rem;
+}
+
 
 .animation-dropdown {
     display: flex;

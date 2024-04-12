@@ -4,7 +4,12 @@ import { computed, onMounted, ref, watch } from 'vue';
 
 import {pkmnDataRepository} from '../pkmn.js'
 
-const props = defineProps({"pkmnId" : Number, "animation" : String, "direction" : Number})
+const props = defineProps({
+    "pkmnId" : Number, 
+    "animation" : String, 
+    "direction" : Number, 
+    "start" : {type: Number, default:0}
+})
 
 const activeAnimation = computed(() => {
     if (animations.value.has(props.animation)){
@@ -60,7 +65,7 @@ onMounted(() => {
             height: activeAnimation.frameHeight+'px'
         }">
         <img loading="lazy" ref="sprite" class="sprite" :src="activeAnimation.file" draggable="false" :style="{
-            transform: 'translate3d(0,' + -direction * activeAnimation.frameHeight+'px' + ',0)'
+            transform: 'translate3d(' + -start*activeAnimation.frameWidth+'px,' + -direction * activeAnimation.frameHeight+'px,0)'
         }"/>
     </div>
 </template>

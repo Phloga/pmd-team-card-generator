@@ -15,8 +15,6 @@ const pickerPkmnUid = ref(0)
 const pickerType = ref("")
 const pickerPosition = ref([0,0])
 
-const emotionPickerRoot = ref(null)
-
 const teamName = ref("")
 
 const teamCard = ref(null)
@@ -91,7 +89,7 @@ function openSpritePicker(event, pkmnUid){
     pickerType.value ='animation'
     pickerPkmnUid.value = pkmnUid
     //const rect = event.target.getBoundingClientRect();
-    pickerPosition.value = [event.pageX, event.pageY]
+    pickerPosition.value = [event.pageX+30, event.pageY]
 }
 
 function setDirection(pickDirectionEvent){
@@ -105,7 +103,15 @@ function setAnimation(pickAnimationEvent){
     const pkmn = placedPkmn.value.get(pickAnimationEvent.pkmnUid)
     if (pkmn){
         pkmn.animation = pickAnimationEvent.animationName
-        console.log(pkmn)
+        pkmn.animationTileX = 0
+    }
+}
+
+function setAnimationFrame(pickAnimationFrameEvent){
+    const pkmn = placedPkmn.value.get(pickAnimationFrameEvent.pkmnUid)
+    if (pkmn){
+        pkmn.animationTileX = pickAnimationFrameEvent.frameIndex
+        console.log(pkmn.animationTileX)
     }
 }
 
@@ -121,7 +127,7 @@ function removeTeamMember(uid){
         <div class="team-card__active-area">
             <template v-for="[uid, pkmn] in placedPkmn" :key="uid">
             <div class="pkmn-sprite" draggable="true" @click="openSpritePicker($event, pkmn.uid)" @dragstart="dragStart($event, pkmn.uid)" @dragend="dragEnd"  :style="{'top': pkmn.positionY+'px', 'left': pkmn.positionX+'px'}">
-                <AnimatedPkmnSprite :pkmnId="pkmn.pkmnId" :animation="pkmn.animation" :direction="pkmn.animationTileY"/>
+                <AnimatedPkmnSprite :pkmnId="pkmn.pkmnId" :animation="pkmn.animation" :start="pkmn.animationTileX" :direction="pkmn.animationTileY"/>
             </div>
             </template>
             <div class="team-list">
@@ -141,7 +147,7 @@ function removeTeamMember(uid){
     </div>
     <div v-show="pickerType != ''" @click="closeActivePicker()" class="background-overlay"></div>
     <EmotionPicker v-if="pickerType=='emotion'" @pick-emotion="onPickEmotion" :positionX="pickerPosition[0]" :positionY="pickerPosition[1]" :pkmn="placedPkmn.get(pickerPkmnUid)"></EmotionPicker>
-    <AnimationPicker v-if="pickerType=='animation'" @pick-animation="setAnimation" @pick-direction="setDirection" :positionX="pickerPosition[0]" :positionY="pickerPosition[1]" :pkmn="placedPkmn.get(pickerPkmnUid)"></AnimationPicker>
+    <AnimationPicker v-if="pickerType=='animation'" @pick-animation="setAnimation" @pick-animation-frame="setAnimationFrame" @pick-direction="setDirection" :positionX="pickerPosition[0]" :positionY="pickerPosition[1]" :pkmn="placedPkmn.get(pickerPkmnUid)"></AnimationPicker>
 </template>
 
 <style>
@@ -198,7 +204,6 @@ function removeTeamMember(uid){
     height: 100vh;
     top: 0;
     left:0;
-    background-color: rgba(100,0,200,20%);
 }
 
 .clickable_portrait {

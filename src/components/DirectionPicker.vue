@@ -38,12 +38,12 @@ function onClick(event, dir) {
 
     .direction-picker__button {
         border: none;
-        background: rgba(0,0,0,12%);
+        background: rgba(0,0,0,35%);
         justify-self: center;
     }
 
     .direction-picker__button:hover {
-        background: rgba(0,0,0,25%);
+        background: rgba(0,0,0,50%);
     }
 
     .icon-direction-arrow {
