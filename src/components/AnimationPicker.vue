@@ -72,12 +72,12 @@ function setAnimationFrame(event, pkmnUid){
         </div>
 
         <div class="animation-dropdown translucent-panel">
-            <div v-for="[name, anim] in animations" :key="name" @click="onClick($event, name)" class="animation-tile">
+            <div v-for="[name, _anim] in animations" :key="name" @click="onClick($event, name)" class="animation-tile">
                 <AnimatedPkmnSprite :pkmnId="pkmn.pkmnId" :animation="name" :direction="0"/>
                 <div class="animation-tile__name"> {{ name }}</div>
             </div>
         </div>
-        <input ref="frameNumInput" class="frame-input" type="number" @keyup="setAnimationFrame($event, pkmn.uid)" :value="pkmn.animationTileX">
+        <input ref="frameNumInput" class="frame-input" type="number" @input="setAnimationFrame($event, pkmn.uid)" :value="pkmn.animationTileX">
     </div>
 </template>
 
@@ -90,7 +90,7 @@ function setAnimationFrame(event, pkmnUid){
 
 .animation-tile {
     position:relative;
-    border: 1px solid rgb(50,50,50);
+    border: 1px solid rgb(255,255,255);
     margin-top: 1px;
 }
 

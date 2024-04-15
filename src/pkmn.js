@@ -6,8 +6,13 @@ export const spriteConfigLocation = spritesCollabUri + 'sprite_config.json'
 
 import pkmnDataImport from './pkmn-data.json'
 
-const spriteUrl = '/SpriteCollab/sprite/'
-const portraitUrl = '/SpriteCollab/portrait/'
+const pmdSpriteCollabBaseUrl = "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/"
+//const pmdSpriteCollabBaseUrl = "/SpriteCollab/"
+
+const spriteUrl = pmdSpriteCollabBaseUrl + 'sprite/'
+const portraitUrl = pmdSpriteCollabBaseUrl + 'portrait/'
+
+//const creditsPath = pmdSpriteCollabBaseUrl + "credit_names.txt"
 
 function zeroPad(num){
     return String(num).padStart(4, '0')
