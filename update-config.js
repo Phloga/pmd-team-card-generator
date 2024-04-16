@@ -1,12 +1,13 @@
 #!/usr/bin/env node
 import fs from 'fs';
 
-const spritesLocation = './public/SpriteCollab/sprite'
+const spritesLocation = './SpriteCollab/sprite'
 
-const testMode = false
+const pkmnNameTranslationSource = "./pokemon-names/data"
 
 
-const spriteConfigImport = await import('./public/SpriteCollab/sprite_config.json' , {
+
+const spriteConfigImport = await import('./SpriteCollab/sprite_config.json' , {
     assert: { type: "json" },
   });
 
@@ -14,14 +15,11 @@ const spriteConfigImport = await import('./public/SpriteCollab/sprite_config.jso
 
 let spritesDir = await fs.promises.readdir(spritesLocation)
 
-if (testMode) {
-  spritesDir = spritesDir.slice(0,50);
-}
-
 const spriteData = spritesDir.map( value => {return {id : value}})
 
 
-const languagesDir = await fs.promises.readdir("./src/assets/names")
+
+const languagesDir = await fs.promises.readdir(pkmnNameTranslationSource)
 
 
 
@@ -32,4 +30,7 @@ const config = {
 }
 
 await fs.promises.writeFile("./src/pkmn-data.json", JSON.stringify(config))
+
+const promises = languagesDir.map((file) => fs.promises.copyFile(pkmnNameTranslationSource + '/' + file, "./src/assets/pkmn-names/" + file))
+
 console.log(config)

@@ -64,7 +64,11 @@ class PkmnDataRepository {
     }
 
     pkmnIds() {
-        return this.pkmnData.spriteData.map( rec => parseInt(rec.id))
+        return this.pkmnData.spriteData.map( rec => parseInt(rec.id)).filter((v) => v != 0)
+    }
+
+    getLanguages() {
+        return this.pkmnData.languages
     }
 
     getPreloadedAnimData(pkmnId){
