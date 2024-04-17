@@ -9,13 +9,16 @@ const pkmnNameTranslationSource = "./pokemon-names/data"
 
 const spriteConfigImport = await import('./SpriteCollab/sprite_config.json' , {
     assert: { type: "json" },
-  });
+});
 
 //import spriteConfigImport from './public/SpriteCollab/sprite_config.json' with {type: 'json'}
 
 let spritesDir = await fs.promises.readdir(spritesLocation)
 
-const spriteData = spritesDir.map( value => {return {id : value}})
+
+const spriteData = spritesDir.map( value => {return {
+  id : value
+}})
 
 
 

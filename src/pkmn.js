@@ -47,6 +47,7 @@ class PkmnSpritePlacement {
         this.positionY = positionY
         this.name = name
         this.emotion = emotion
+        this.shiny = false
         this.animationTileX = 0
         this.animationTileY = 0
         this.maxAnimationTileX = 0
@@ -54,6 +55,10 @@ class PkmnSpritePlacement {
 
     setDirection(dir){
         this.animationTileY = dir
+    }
+    
+    toggleShiny(){
+        this.shiny = !this.shiny
     }
 }
 
@@ -71,8 +76,16 @@ class PkmnDataRepository {
         return this.pkmnData.languages
     }
 
-    getPreloadedAnimData(pkmnId){
-        return this.animations.get(pkmnId)
+    compositeKey(pkmnId, shiny){
+        let key = pkmnId.toString()
+        if (shiny){
+            key = key + "s"
+        }
+        return key
+    }
+
+    getPreloadedAnimData(pkmnId, shiny=false){
+        return this.animations.get(this.compositeKey(pkmnId, shiny))
     }
 
     getPortraitEmotions() {
@@ -83,21 +96,31 @@ class PkmnDataRepository {
         return this.pkmnData.spriteConfig.portrait_size
     }
 
-    getPortraitPath(pkmnId, emotion) {
-        return portraitUrl + zeroPad(pkmnId) + "/" + emotion + ".png"
+    variantPath(basePath, shiny) {
+        let path = basePath
+        if (shiny) {
+            path = path + "/0000/0001"
+        }
+        return path
     }
 
-    hasAnimData(pkmnId){
-        return this.animations.has(pkmnId)
+    getPortraitPath(pkmnId, emotion, shiny) {
+        let base = portraitUrl + zeroPad(pkmnId)
+        return this.variantPath(base, shiny) + "/" + emotion + ".png"
     }
 
-    getAnimData(pkmnId){
-        return this.animations.get(pkmnId)
+    hasAnimData(pkmnId, shiny=false){
+        return this.animations.has(this.compositeKey(pkmnId, shiny))
     }
 
-    async fetchAnimData(pkmnId){
-        if (!this.animations.has(pkmnId)){
-            const animRoot = spriteUrl + zeroPad(pkmnId)
+    getAnimData(pkmnId, shiny=false){
+        return this.animations.get(this.compositeKey(pkmnId, shiny))
+    }
+
+    async fetchAnimData(pkmnId, shiny=false){
+        const pkmnKey = this.compositeKey(pkmnId, shiny)
+        if (!this.animations.has(pkmnKey)){
+            const animRoot = this.variantPath(spriteUrl + zeroPad(pkmnId), shiny)
             const response = await fetch(animRoot + "/AnimData.xml")
             const xmlText = await response.text()
             const parser = new DOMParser()
@@ -156,9 +179,9 @@ class PkmnDataRepository {
                     anim[1].file = copyRef.file
                 }
             }
-            this.animations.set(pkmnId, newAnimationSet)
+            this.animations.set(pkmnKey, newAnimationSet)
         }
-        return this.getAnimData(pkmnId) //this returns a map
+        return this.getAnimData(pkmnId, shiny) //this returns a map
     }
 }
 

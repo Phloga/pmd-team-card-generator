@@ -40,7 +40,6 @@ function dropHandler(event){
             const rect = JSON.parse(rectData)
             newPkmn.positionX = event.pageX - rect.width/2 - rootRect.left
             newPkmn.positionY = event.pageY - rect.height/2 - rootRect.top - window.scrollY
-            console.log("rect corrected")
         } else {
             newPkmn.positionX = event.pageX - rootRect.left
             newPkmn.positionY = event.pageY - rootRect.top - window.scrollY
@@ -111,12 +110,16 @@ function setAnimationFrame(pickAnimationFrameEvent){
     const pkmn = placedPkmn.value.get(pickAnimationFrameEvent.pkmnUid)
     if (pkmn){
         pkmn.animationTileX = pickAnimationFrameEvent.frameIndex
-        console.log(pkmn.animationTileX)
     }
 }
 
 function removeTeamMember(uid){
     placedPkmn.value.delete(uid)
+}
+
+function toggleShiny(uid){
+    const pkmn = placedPkmn.value.get(uid)
+    pkmn.shiny = !pkmn.shiny
 }
 
 </script>
@@ -127,15 +130,16 @@ function removeTeamMember(uid){
         <div class="team-card__active-area">
             <template v-for="[uid, pkmn] in placedPkmn" :key="uid">
             <div class="pkmn-sprite" draggable="true" @click="openSpritePicker($event, pkmn.uid)" @dragstart="dragStart($event, pkmn.uid)" @dragend="dragEnd"  :style="{'top': pkmn.positionY+'px', 'left': pkmn.positionX+'px'}">
-                <AnimatedPkmnSprite :pkmnId="pkmn.pkmnId" :animation="pkmn.animation" :start="pkmn.animationTileX" :direction="pkmn.animationTileY"/>
+                <AnimatedPkmnSprite :pkmnId="pkmn.pkmnId" :animation="pkmn.animation" :start="pkmn.animationTileX" :direction="pkmn.animationTileY" :shiny="pkmn.shiny"/>
             </div>
             </template>
             <div class="team-list">
                 <div v-for="[uid, pkmn] in placedPkmn" :key="uid" class="team-member">
                     <button @click="openEmotionPicker($event, pkmn.uid)" class="clickable_portrait">
-                        <PkmnPortrait :pkmnId="pkmn.pkmnId" :emotion="pkmn.emotion"></PkmnPortrait>
+                        <PkmnPortrait :pkmnId="pkmn.pkmnId" :emotion="pkmn.emotion" :shiny="pkmn.shiny"></PkmnPortrait>
                     </button>
                     <input>
+                    <i class="icon-shiny team-member__toggle_shiny" @click="toggleShiny(uid)"></i>
                     <i class="icon-xcross team-member__remove" @click="removeTeamMember(uid)"></i>
                 </div>
             </div>
@@ -152,6 +156,15 @@ function removeTeamMember(uid){
 
 <style>
 
+.icon-shiny {
+    mask-image: url('../assets/icon/shiny.svg');
+    background-color: var(--color-text);
+    mask-repeat: no-repeat;
+    mask-size: 100% auto;
+    display: block;
+    height: 1rem;
+    width: 1rem;
+}
 
 .icon-xcross {
     mask-image: url('../assets/icon/xmark-solid.svg');
@@ -244,6 +257,17 @@ function removeTeamMember(uid){
     right: 0;
     top: 0;
 }
+
+.team-member__toggle_shiny {
+    position: absolute;
+    right: 1rem;
+    top: 0; 
+}
+
+.team-member__toggle_shiny:hover {
+    background-color: red;
+}
+
 
 .team-member__remove:hover {
     background-color: red;

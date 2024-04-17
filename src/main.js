@@ -29,7 +29,7 @@ const i18n = createI18n({
     locale: navigator.language, // set locale
     fallbackLocale: 'en', // set fallback locale
     messages: messages
-  })
+})
 
 
 

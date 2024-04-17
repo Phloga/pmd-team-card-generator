@@ -21,7 +21,7 @@ function pickEmotion(event, pkmnUid, emotion){
 <template>
     <div class="dropdown" :style="{'top': positionY+'px', 'left': positionX+'px'}">
         <div v-for="emo,i in emotions" class="dropdown__entry" :key="i">
-            <img :src="pkmnDataRepository.getPortraitPath(props.pkmn.pkmnId, emo)" @click="pickEmotion($event, props.pkmn.uid, emo)">
+            <img :src="pkmnDataRepository.getPortraitPath(props.pkmn.pkmnId, emo, props.pkmn.shiny)" @click="pickEmotion($event, props.pkmn.uid, emo)">
             <div>{{emo}}</div>
         </div>
     </div>

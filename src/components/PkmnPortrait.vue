@@ -1,13 +1,16 @@
 <script setup>
 
-import { computed, onMounted, ref } from 'vue';
+import { computed, ref } from 'vue';
 
 import {pkmnDataRepository} from '../pkmn.js'
 
-const props = defineProps(["pkmnId", "emotion"])
+const props = defineProps({
+    "pkmnId" : { type: Number, required:true}, 
+    "emotion" : { type: String, default: "Normal"}, 
+    "shiny" : { type: Boolean, default: false }})
 
 const portraitPath = computed(() => {
-    return pkmnDataRepository.getPortraitPath(props.pkmnId, props.emotion)
+    return pkmnDataRepository.getPortraitPath(props.pkmnId, props.emotion, props.shiny)
 })
 
 const portraitSize = ref(pkmnDataRepository.getPortraitSize())

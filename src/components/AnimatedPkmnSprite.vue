@@ -6,10 +6,15 @@ import {pkmnDataRepository} from '../pkmn.js'
 
 const props = defineProps({
     "pkmnId" : Number, 
+    "shiny" : {type: Boolean, default: false},
     "animation" : String, 
     "direction" : Number, 
     "start" : {type: Number, default:0}
 })
+
+let intersectionObserver = null
+
+const animations = ref(new Map())
 
 const activeAnimation = computed(() => {
     if (animations.value.has(props.animation)){
@@ -24,21 +29,21 @@ const activeAnimation = computed(() => {
     }
 })
 
-let intersectionObserver = null
-
-const animations = ref(new Map())
-
 const sprite = ref(null)
 const spriteContainer = ref(null)
 
-async function fetchAnimations(pkmnId){
-    animations.value = await pkmnDataRepository.fetchAnimData(pkmnId)
+async function fetchAnimations(pkmnId, shiny){
+    animations.value = await pkmnDataRepository.fetchAnimData(pkmnId,shiny)
 }
 
 watch(() => props.pkmnId, async (newPkmnId, oldPkmnId) => {
-    console.log("updated pkmnid")
-    fetchAnimations(newPkmnId)
+    fetchAnimations(newPkmnId, props.shiny)
 })
+
+watch(() => props.shiny, async (newShiny, oldShiny) => {
+    fetchAnimations(props.pkmnId, newShiny)
+})
+
 
 onMounted(() => {
     if (pkmnDataRepository.hasAnimData(props.pkmnId)){
@@ -47,7 +52,6 @@ onMounted(() => {
         intersectionObserver = new IntersectionObserver((entries) => {
             if (entries[0].intersectionRatio <= 0) return;
             fetchAnimations(props.pkmnId)
-            console.log("loading animation for " + props.pkmnId);
             intersectionObserver.unobserve(entries[0].target);
             intersectionObserver = null
         });
