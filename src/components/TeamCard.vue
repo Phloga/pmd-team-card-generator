@@ -1,11 +1,11 @@
 <script setup>
-import { defineProps, ref } from 'vue';
+import { defineProps, ref, computed } from 'vue';
 import AnimatedPkmnSprite from './AnimatedPkmnSprite.vue'
 import PkmnPortrait from './PkmnPortrait.vue';
 import EmotionPicker from './EmotionPicker.vue'
 import AnimationPicker from './AnimationPicker.vue';
 
-const props = defineProps(["background"])
+const props = defineProps(["background", "width", "height"])
 
 
 const placedPkmn = ref(new Map())
@@ -17,6 +17,11 @@ const pickerPosition = ref([0,0])
 const teamName = ref("")
 
 const teamCard = ref(null)
+
+const cardDimensions = computed(() => {
+    const pixelScaleFactor = 2;
+    return {'width': pixelScaleFactor*props.width + 'px', 'height': pixelScaleFactor*props.height + 'px'}
+})
 
 function dragoverHandler(event){
 	event.preventDefault();
@@ -124,7 +129,7 @@ function toggleShiny(uid){
 </script>
 
 <template>
-    <div ref="teamCard" @dragover="dragoverHandler" @drop="dropHandler" @dragleave="dragLeaveHandler" class="team-card">
+    <div id="teamCard" ref="teamCard" @dragover="dragoverHandler" @drop="dropHandler" @dragleave="dragLeaveHandler" class="team-card" :style="cardDimensions">
         <img :src="background" class="team-card__background">
         <div class="team-card__active-area">
             <template v-for="[uid, pkmn] in placedPkmn" :key="uid">
@@ -175,24 +180,23 @@ function toggleShiny(uid){
 }
 
 .team-card {
-    background-repeat: no-repeat;
-    background-size: contain;
     position: relative;
-    width: 480px;
+    margin: 0;
+    padding: 0;
 }
 
 .team-card__background {
     image-rendering: pixelated;
     object-fit: contain;
     width: 100%;
-    top: 0%;
-    left: 0%;
+    top: 0;
+    left: 0;
 }
 
 .team-card__active-area {
     position: absolute;
-    top: 0%;
-    left: 0%;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
 }

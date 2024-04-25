@@ -5,6 +5,8 @@ import {ref, computed} from 'vue'
 import SearchablePkmnGrid from './SearchablePkmnGrid.vue'
 import TeamCard from './TeamCard.vue'
 
+import * as htmlToImage from 'html-to-image';
+
 
 import PMDSkyStartURL from '../assets/card-backgrounds/PMD Sky Start.png'
 
@@ -23,18 +25,33 @@ const backgrounds = ref([
         {
             "url" : PMDSkyStartURL,
             "name" : "PMD Sky Start",
-            "style" : "pixelart"
+            "style" : "pixelart",
+            "height" : 192,
+            "width" : 256
         }
     ])
 
 const selectedBackground = ref(backgrounds.value[0])
+
+
+function generateCardAsPng(event){
+    htmlToImage.toBlob(document.getElementById('teamCard')).then(
+        function (blob) {
+            var blobUrl = URL.createObjectURL(blob);
+            var link = document.createElement("a"); // Or maybe get it from the current document
+            link.href = blobUrl;
+            link.download = "team.png";
+            link.innerHTML = "";
+            link.click()
+        });
+}
 
 </script>
 
 
 <template>
     <div class="app-root">
-        <TeamCard :background="selectedBackground.url"></TeamCard>
+        <TeamCard :background="selectedBackground.url" :width="selectedBackground.width" :height="selectedBackground.height"></TeamCard>
         <div class="accordeon pallete_panel">
             <div class="accordeon__header">
                 <button class="no-background">
@@ -45,6 +62,7 @@ const selectedBackground = ref(backgrounds.value[0])
                 <SearchablePkmnGrid :pkmnList="pkmnIds" v-model="pkmnSearchString"></SearchablePkmnGrid>
             </div>
         </div>
+        <button @click="generateCardAsPng">Save</button>
     </div>
 </template>
 
