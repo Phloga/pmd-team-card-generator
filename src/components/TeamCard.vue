@@ -1,7 +1,6 @@
 <script setup>
 import { defineProps, ref } from 'vue';
 import AnimatedPkmnSprite from './AnimatedPkmnSprite.vue'
-import {pkmnFactory} from '../pkmn.js'
 import PkmnPortrait from './PkmnPortrait.vue';
 import EmotionPicker from './EmotionPicker.vue'
 import AnimationPicker from './AnimationPicker.vue';
@@ -143,9 +142,9 @@ function toggleShiny(uid){
                     <i class="icon-xcross team-member__remove" @click="removeTeamMember(uid)"></i>
                 </div>
             </div>
-            <div class="team-card__info pmd-font">
-                <div>Team:</div>
-                <input v-model="teamName" class="pmd-font">
+            <div class="team-card__info">
+                <div class="right-aligned pmd-font">Team Name</div>
+                <input v-model="teamName" class="pmd-font right-aligned">
             </div>
         </div>
     </div>
@@ -208,7 +207,7 @@ function toggleShiny(uid){
     border: none;
     background: rgb(0,0,0,25%);
     font-size: 1.5rem;
-} 
+}
 
 .background-overlay{
     position:fixed;
@@ -246,7 +245,7 @@ function toggleShiny(uid){
 .team-member input {
     background-color: rgba(0,0,0,33%);
     border: none;
-    font-family: PKMN-Mystery-Dungeon;
+    font-family: wondermail;
     color: white;
     font-size: 1.5em;
     min-width: 0;

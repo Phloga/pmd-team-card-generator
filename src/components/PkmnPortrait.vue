@@ -2,7 +2,7 @@
 
 import { computed, ref } from 'vue';
 
-import {pkmnDataRepository} from '../pkmn.js'
+import {pkmnDataRepository} from '../pkmn'
 
 const props = defineProps({
     "pkmnId" : { type: Number, required:true}, 

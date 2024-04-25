@@ -7,8 +7,12 @@
 }
 
 .pmd-font {
-  font-family: 'PKMN-Mystery-Dungeon';
+  font-family: 'wondermail';
   color: white;
+}
+
+.right-aligned {
+  text-align: right;
 }
 
 
@@ -335,8 +339,8 @@ table.item-table {
 
 
 @font-face {
-  font-family: PKMN-Mystery-Dungeon;
-  src: url(/font/PKMN-Mystery-Dungeon.ttf);
+  font-family: wondermail;
+  src: url(/font/wondermail.ttf);
 }
 
 /*
