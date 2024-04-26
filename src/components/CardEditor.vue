@@ -10,7 +10,7 @@ import * as htmlToImage from 'html-to-image';
 
 import PMDSkyStartURL from '../assets/card-backgrounds/PMD Sky Start.png'
 
-import {pkmnDataRepository} from '../pkmn.js'
+import {pkmnDataRepository} from '../pkmn.ts'
 
 
 const pkmnIds = computed(() => {

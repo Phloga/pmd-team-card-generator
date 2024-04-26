@@ -1,5 +1,5 @@
 <script setup>
-import {pkmnDataRepository} from '../pkmn.js'
+import {pkmnDataRepository} from '../pkmn.ts'
 import {ref} from 'vue'
 
 const props = defineProps(["pkmn", "positionY", "positionX"])

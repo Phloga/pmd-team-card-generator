@@ -2,7 +2,7 @@
 import DirectionPicker from './DirectionPicker.vue'
 import AnimatedPkmnSprite from './AnimatedPkmnSprite.vue';
 
-import {pkmnDataRepository} from '../pkmn.js'
+import {pkmnDataRepository} from '../pkmn.ts'
 
 import {watch, ref} from 'vue'
 import { onMounted } from 'vue';

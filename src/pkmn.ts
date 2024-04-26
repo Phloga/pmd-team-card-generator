@@ -14,22 +14,24 @@ const portraitUrl = pmdSpriteCollabBaseUrl + 'portrait/'
 
 //const creditsPath = pmdSpriteCollabBaseUrl + "credit_names.txt"
 
-function zeroPad(num){
+function zeroPad(num:number){
     return String(num).padStart(4, '0')
 }
 
 class PkmnFactory {
+    counter: number
+
     constructor() {
         this.counter = 0
     }
 
-    makePkmn(pkmnId, animation, positionX, positionY){
+    makePkmn(pkmnId : number, animation : string, positionX : number, positionY : number){
         const newPkmn = new PkmnSpritePlacement(this.counter, pkmnId, "", animation, "Normal", positionX, positionY)
         ++this.counter 
         return newPkmn
     }
 
-    clonePkmn(pkmn){
+    clonePkmn(pkmn : PkmnSpritePlacement){
         const newPkmn = new PkmnSpritePlacement(this.counter, pkmn.pkmnId, pkmn.name, pkmn.animation, pkmn.emotion, pkmn.positionX, pkmn.positionY)
         ++this.counter 
         return newPkmn
@@ -39,7 +41,19 @@ class PkmnFactory {
 export let pkmnFactory = new PkmnFactory()
 
 class PkmnSpritePlacement {
-    constructor(uid ,pkmnId, name, animation, emotion, positionX, positionY){
+    uid: number
+    pkmnId: number
+    animation: string
+    positionX: number
+    positionY: number
+    name: string
+    emotion: string
+    shiny: boolean
+    animationTileX: number
+    animationTileY: number
+    maxAnimationTileX: number
+
+    constructor(uid : number,pkmnId : number, name : string, animation : string, emotion : string, positionX : number, positionY : number){
         this.uid = uid
         this.pkmnId = pkmnId
         this.animation = animation
@@ -53,7 +67,7 @@ class PkmnSpritePlacement {
         this.maxAnimationTileX = 0
     }
 
-    setDirection(dir){
+    setDirection(dir : number){
         this.animationTileY = dir
     }
     
@@ -63,20 +77,23 @@ class PkmnSpritePlacement {
 }
 
 class PkmnDataRepository {
+    pkmnData : any
+    animations: Map<string,any>
+
     constructor(){
         this.pkmnData = pkmnDataImport;
         this.animations = new Map();
     }
 
     pkmnIds() {
-        return this.pkmnData.spriteData.map( rec => parseInt(rec.id)).filter((v) => v != 0)
+        return this.pkmnData.spriteData.map( (rec: any) => parseInt(rec.id)).filter((v: any) => v != 0)
     }
 
     getLanguages() {
         return this.pkmnData.languages
     }
 
-    compositeKey(pkmnId, shiny){
+    compositeKey(pkmnId : number, shiny:boolean){
         let key = pkmnId.toString()
         if (shiny){
             key = key + "s"
@@ -84,7 +101,7 @@ class PkmnDataRepository {
         return key
     }
 
-    getPreloadedAnimData(pkmnId, shiny=false){
+    getPreloadedAnimData(pkmnId:number, shiny=false){
         return this.animations.get(this.compositeKey(pkmnId, shiny))
     }
 
@@ -96,7 +113,7 @@ class PkmnDataRepository {
         return this.pkmnData.spriteConfig.portrait_size
     }
 
-    variantPath(basePath, shiny) {
+    variantPath(basePath:string, shiny:boolean) {
         let path = basePath
         if (shiny) {
             path = path + "/0000/0001"
@@ -104,20 +121,20 @@ class PkmnDataRepository {
         return path
     }
 
-    getPortraitPath(pkmnId, emotion, shiny) {
+    getPortraitPath(pkmnId:number, emotion:string, shiny:boolean) {
         let base = portraitUrl + zeroPad(pkmnId)
         return this.variantPath(base, shiny) + "/" + emotion + ".png"
     }
 
-    hasAnimData(pkmnId, shiny=false){
+    hasAnimData(pkmnId:number, shiny=false){
         return this.animations.has(this.compositeKey(pkmnId, shiny))
     }
 
-    getAnimData(pkmnId, shiny=false){
+    getAnimData(pkmnId:number, shiny=false){
         return this.animations.get(this.compositeKey(pkmnId, shiny))
     }
 
-    async fetchAnimData(pkmnId, shiny=false){
+    async fetchAnimData(pkmnId:number, shiny=false){
         const pkmnKey = this.compositeKey(pkmnId, shiny)
         if (!this.animations.has(pkmnKey)){
             const animRoot = this.variantPath(spriteUrl + zeroPad(pkmnId), shiny)
@@ -126,10 +143,9 @@ class PkmnDataRepository {
             const parser = new DOMParser()
             const animData = parser.parseFromString(xmlText, "text/xml")
         
-            const errorNode = animData.querySelector("parsererror");
+            const errorNode = animData.querySelector("parsererror")!;
             if (errorNode) {
-                //console.log(errorNode);
-                throw new Error("Failed to Parse " + animRoot + "/AnimData.xml\nerrorNode:\n" + toString(errorNode))
+                throw new Error("Failed to Parse " + animRoot + "/AnimData.xml\nerrorNode:\n" + errorNode)
             }
     
             const anims = animData.getElementsByTagName("Anims")[0].getElementsByTagName("Anim")
@@ -151,11 +167,11 @@ class PkmnDataRepository {
                         }
                     )
                 } else {
-                    const frameWidth = parseInt(anim.getElementsByTagName("FrameWidth")[0].textContent)
-                    const frameHeight = parseInt(anim.getElementsByTagName("FrameHeight")[0].textContent)
+                    const frameWidth = parseInt(anim.getElementsByTagName("FrameWidth")[0].textContent!)
+                    const frameHeight = parseInt(anim.getElementsByTagName("FrameHeight")[0].textContent!)
                     const durationsNode = anim.getElementsByTagName("Durations")[0]
                     const durations = Array.from(durationsNode.getElementsByTagName("Duration")).map((element) => {
-                        return parseInt(element.textContent)
+                        return parseInt(element.textContent!)
                     })
                     const file = animRoot + "/" + name + "-Anim.png"
                     newAnimationSet.set(name,

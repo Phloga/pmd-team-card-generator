@@ -1,5 +1,5 @@
 <script setup>
-import { defineProps, ref, computed } from 'vue';
+import { ref, computed } from 'vue';
 import AnimatedPkmnSprite from './AnimatedPkmnSprite.vue'
 import PkmnPortrait from './PkmnPortrait.vue';
 import EmotionPicker from './EmotionPicker.vue'

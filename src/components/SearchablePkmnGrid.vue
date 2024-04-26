@@ -1,7 +1,7 @@
 <script setup>
 import {computed} from 'vue'
 import AnimatedPkmnSprite from './AnimatedPkmnSprite.vue'
-import {pkmnFactory} from '../pkmn.js'
+import {pkmnFactory} from '../pkmn.ts'
 
 
 const props = defineProps(["pkmnList","modelValue"])
