@@ -113,10 +113,15 @@ class PkmnDataRepository {
         return this.pkmnData.spriteConfig.portrait_size
     }
 
-    variantPath(basePath:string, shiny:boolean) {
+    variantPath(basePath:string, shiny:boolean, form:number = 0) {
         let path = basePath
+        
         if (shiny) {
-            path = path + "/0000/0001"
+            if (form == 0){
+                path = path + "/0000/0001"
+            } else {
+                path = path + "/0001"
+            }
         }
         return path
     }
@@ -134,6 +139,56 @@ class PkmnDataRepository {
         return this.animations.get(this.compositeKey(pkmnId, shiny))
     }
 
+    parseAnimData(animData: Document, animRoot: string){
+        const newAnimationSet = new Map();
+        const anims = animData.getElementsByTagName("Anims")[0].getElementsByTagName("Anim")
+
+        for (const anim of anims){
+            const name = anim.getElementsByTagName("Name")[0].textContent
+            const copyOfTag = anim.getElementsByTagName("CopyOf")
+
+            if (copyOfTag.length > 0) {
+                newAnimationSet.set(name,
+                    {
+                        file: null,
+                        frameHeight: null,
+                        frameWidth: null,
+                        durations: [],
+                        copyOf : copyOfTag[0].textContent
+                    }
+                )
+            } else {
+                const frameWidth = parseInt(anim.getElementsByTagName("FrameWidth")[0].textContent!)
+                const frameHeight = parseInt(anim.getElementsByTagName("FrameHeight")[0].textContent!)
+                const durationsNode = anim.getElementsByTagName("Durations")[0]
+                const durations = Array.from(durationsNode.getElementsByTagName("Duration")).map((element) => {
+                    return parseInt(element.textContent!)
+                })
+                const file = animRoot + "/" + name + "-Anim.png"
+                newAnimationSet.set(name,
+                    {
+                        file: file,
+                        frameHeight: frameHeight,
+                        frameWidth: frameWidth,
+                        durations: durations,
+                        copyOf : ""
+                    }
+                )
+            }
+        }
+        //follow copyOf references
+        for (const anim of newAnimationSet){
+            if (anim[1].copyOf.length > 0){
+                const copyRef = newAnimationSet.get(anim[1].copyOf)
+                anim[1].frameHeight = copyRef.frameHeight
+                anim[1].frameWidth = copyRef.frameWidth
+                anim[1].durations = copyRef.durations
+                anim[1].file = copyRef.file
+            }
+        }
+        return newAnimationSet
+    }
+
     async fetchAnimData(pkmnId:number, shiny=false){
         const pkmnKey = this.compositeKey(pkmnId, shiny)
         if (!this.animations.has(pkmnKey)){
@@ -147,55 +202,7 @@ class PkmnDataRepository {
             if (errorNode) {
                 throw new Error("Failed to Parse " + animRoot + "/AnimData.xml\nerrorNode:\n" + errorNode)
             }
-    
-            const anims = animData.getElementsByTagName("Anims")[0].getElementsByTagName("Anim")
-        
-            const newAnimationSet = new Map();
-
-            for (const anim of anims){
-                const name = anim.getElementsByTagName("Name")[0].textContent
-                const copyOfTag = anim.getElementsByTagName("CopyOf")
-
-                if (copyOfTag.length > 0) {
-                    newAnimationSet.set(name,
-                        {
-                            file: null,
-                            frameHeight: null,
-                            frameWidth: null,
-                            durations: [],
-                            copyOf : copyOfTag[0].textContent
-                        }
-                    )
-                } else {
-                    const frameWidth = parseInt(anim.getElementsByTagName("FrameWidth")[0].textContent!)
-                    const frameHeight = parseInt(anim.getElementsByTagName("FrameHeight")[0].textContent!)
-                    const durationsNode = anim.getElementsByTagName("Durations")[0]
-                    const durations = Array.from(durationsNode.getElementsByTagName("Duration")).map((element) => {
-                        return parseInt(element.textContent!)
-                    })
-                    const file = animRoot + "/" + name + "-Anim.png"
-                    newAnimationSet.set(name,
-                        {
-                            file: file,
-                            frameHeight: frameHeight,
-                            frameWidth: frameWidth,
-                            durations: durations,
-                            copyOf : ""
-                        }
-                    )
-                }
-            }
-            //follow copyOf references
-            for (const anim of newAnimationSet){
-                if (anim[1].copyOf.length > 0){
-                    const copyRef = newAnimationSet.get(anim[1].copyOf)
-                    anim[1].frameHeight = copyRef.frameHeight
-                    anim[1].frameWidth = copyRef.frameWidth
-                    anim[1].durations = copyRef.durations
-                    anim[1].file = copyRef.file
-                }
-            }
-            this.animations.set(pkmnKey, newAnimationSet)
+            this.animations.set(pkmnKey, this.parseAnimData(animData, animRoot))
         }
         return this.getAnimData(pkmnId, shiny) //this returns a map
     }
