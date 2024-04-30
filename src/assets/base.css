@@ -63,6 +63,10 @@
     --color-md-textbox-i1 : rgb(73,82,249);
     --color-md-textbox-i2 : rgb(50,45,192);
     --color-md-textbox-bg : rgba(51,51,51,80%);
+
+    --color-button-bg : rgba(51,51,51,80%);
+    --color-button-bg-hover : rgba(66,66,66,80%);
+    --color-button-bg-active : rgba(77,77,77,80%);
   }
 /*}*/
 

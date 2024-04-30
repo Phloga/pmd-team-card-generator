@@ -148,8 +148,8 @@ function toggleShiny(uid){
                 </div>
             </div>
             <div class="team-card__info">
-                <div class="right-aligned pmd-font">Team Name</div>
-                <input v-model="teamName" class="pmd-font right-aligned">
+                <div class="text-right pmd-font">Team Name</div>
+                <input v-model="teamName" class="pmd-font text-right">
             </div>
         </div>
     </div>

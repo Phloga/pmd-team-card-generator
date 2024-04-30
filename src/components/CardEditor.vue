@@ -4,11 +4,13 @@ import {ref, computed} from 'vue'
 
 import SearchablePkmnGrid from './SearchablePkmnGrid.vue'
 import TeamCard from './TeamCard.vue'
+import BackgroundPicker from './BackgroundPicker.vue';
 
 import * as htmlToImage from 'html-to-image';
 
 
 import PMDSkyStartURL from '../assets/card-backgrounds/PMD Sky Start.png'
+import PMDSkyTitleURL from '../assets/card-backgrounds/PMD Sky Title Screen BG.png'
 
 import {pkmnDataRepository} from '../pkmn.ts'
 
@@ -28,11 +30,29 @@ const backgrounds = ref([
             "style" : "pixelart",
             "height" : 192,
             "width" : 256
+        },
+        {
+            "url" : PMDSkyTitleURL,
+            "name" : "PMD Sky Title Screen",
+            "style" : "pixelart",
+            "height" : 192,
+            "width" : 256
         }
     ])
 
 const selectedBackground = ref(backgrounds.value[0])
 
+const backgroundPickerVisible = ref(false)
+
+
+function setBackgroundPickerVisibility(visible){
+    backgroundPickerVisible.value = visible
+}
+
+function setBackground(bg){
+    selectedBackground.value = bg;
+    setBackgroundPickerVisibility(false)
+}
 
 function generateCardAsPng(event){
     htmlToImage.toBlob(document.getElementById('teamCard')).then(
@@ -51,18 +71,33 @@ function generateCardAsPng(event){
 
 <template>
     <div class="app-root">
+        <BackgroundPicker v-show="backgroundPickerVisible" @close="setBackgroundPickerVisibility(false)" @selected="setBackground" :backgrounds="backgrounds"></BackgroundPicker>
         <TeamCard :background="selectedBackground.url" :width="selectedBackground.width" :height="selectedBackground.height"></TeamCard>
-        <div class="accordeon pallete_panel">
-            <div class="accordeon__header">
-                <button class="no-background">
-                <i class="icon-accordeon"></i>   
-                </button>
+        <div class="md-frame">
+            <div class="accordeon">
+                <div class="accordeon__header">
+                    <button class="no-background">
+                        <i class="icon-accordeon"></i>   
+                    </button>
+                    <div>General</div>
+                </div>
+                <div class="accordeon__body">
+                    <button @click="setBackgroundPickerVisibility(true)">Pick Background</button>
+                    <button @click="generateCardAsPng">Save</button>
+                </div>
             </div>
-            <div class="accordeon__body">
-                <SearchablePkmnGrid :pkmnList="pkmnIds" v-model="pkmnSearchString"></SearchablePkmnGrid>
+            <div class="accordeon">
+                <div class="accordeon__header">
+                    <button class="no-background">
+                    <i class="icon-accordeon"></i>   
+                    </button>
+                    <div>Pokemon</div>
+                </div>
+                <div class="accordeon__body accordeon__body--scrollable">
+                    <SearchablePkmnGrid :pkmnList="pkmnIds" v-model="pkmnSearchString"></SearchablePkmnGrid>
+                </div>
             </div>
         </div>
-        <button @click="generateCardAsPng">Save</button>
     </div>
 </template>
 
@@ -73,6 +108,17 @@ function generateCardAsPng(event){
         flex-flow: column nowrap;
         justify-content: space-around;
         align-items: center;
+    }
+
+    .md-frame {
+        background-color: var(--color-md-textbox-bg);
+        border-width: 0.5rem;
+        border-style: groove ridge ridge groove;
+        border-color: var(--color-md-textbox-i1);
+        outline: var(--color-md-textbox-o1) solid 0.25rem;
+        border-radius: 0.5rem;
+        margin: 0.25rem;
+        width: 60rem;
     }
 
     .pallete_panel {
@@ -97,13 +143,17 @@ function generateCardAsPng(event){
 
     .accordeon .accordeon__body{
         display: none;
-        height: 16rem;
-        overflow-y: scroll;
     }
 
     .accordeon.accordeon--open .accordeon__body{
         display: block;
     }
+
+    .accordeon__body--scrollable {
+        height: 16rem;
+        overflow-y: scroll;
+    }
+
 
     .icon-accordeon {
         mask-image: url('../assets/icon/angle-down-solid.svg');
@@ -118,6 +168,20 @@ function generateCardAsPng(event){
     .accordeon--open .icon-accordeon {
         mask-image: url('../assets/icon/angle-up-solid.svg');
         display: block;
+    }
+
+    button {
+        color: var(--color-text);
+        border: 1px solid var(--color-border);
+        background-color: var(--color-button-bg);
+    }
+
+    button:hover {
+        background-color: var(--color-button-bg-hover);
+    }
+
+    button:active{
+        background-color: var(--color-button-bg-active);
     }
 
     .no-background {
