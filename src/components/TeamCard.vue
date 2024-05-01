@@ -134,7 +134,7 @@ function toggleShiny(uid){
         <div class="team-card__active-area">
             <template v-for="[uid, pkmn] in placedPkmn" :key="uid">
             <div class="pkmn-sprite" draggable="true" @click="openSpritePicker($event, pkmn.uid)" @dragstart="dragStart($event, pkmn.uid)" @dragend="dragEnd"  :style="{'top': pkmn.positionY+'px', 'left': pkmn.positionX+'px'}">
-                <AnimatedPkmnSprite :pkmnId="pkmn.pkmnId" :animation="pkmn.animation" :start="pkmn.animationTileX" :direction="pkmn.animationTileY" :shiny="pkmn.shiny"/>
+                <AnimatedPkmnSprite :pkmnId="pkmn.pkmnId" :animation="pkmn.animation" :start="pkmn.animationTileX" :direction="pkmn.animationTileY" :shiny="pkmn.shiny" :pixel-size="2"/>
             </div>
             </template>
             <div class="team-list">

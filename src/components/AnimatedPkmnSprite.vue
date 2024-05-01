@@ -9,7 +9,8 @@ const props = defineProps({
     "shiny" : {type: Boolean, default: false},
     "animation" : String, 
     "direction" : Number, 
-    "start" : {type: Number, default:0}
+    "start" : {type: Number, default:0},
+    "pixelSize" : {type: Number, default:1}
 })
 
 let intersectionObserver = null
@@ -65,16 +66,22 @@ onMounted(() => {
 <template>
     <div ref="spriteContainer" class="sprite-container" :style="
         {
-            width: activeAnimation.frameWidth+'px', 
-            height: activeAnimation.frameHeight+'px'
+            width: pixelSize*activeAnimation.frameWidth+'px', 
+            height: pixelSize*activeAnimation.frameHeight+'px',
         }">
         <img loading="lazy" ref="sprite" class="sprite" :src="activeAnimation.file" draggable="false" :style="{
-            transform: 'translate3d(' + -start*activeAnimation.frameWidth+'px,' + -direction * activeAnimation.frameHeight+'px,0)'
+            transform: 'scale(' + pixelSize +') ' + 'translate(' + -start*activeAnimation.frameWidth+'px,' + -direction *activeAnimation.frameHeight+'px)'
         }"/>
     </div>
 </template>
 
 <style>
+
+    .sprite {
+        image-rendering: pixelated;
+        transform-origin:top left;
+    }
+
     .sprite-container {
         overflow: hidden;
     }
