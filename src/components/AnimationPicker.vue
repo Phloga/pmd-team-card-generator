@@ -9,9 +9,7 @@ import { onMounted } from 'vue';
 
 const props = defineProps(["pkmn","positionY", "positionX"])
 
-const emit = defineEmits(["pickDirection","pickAnimation", "pickAnimationFrame"])
-
-const frameNumInput = ref(null)
+const emit = defineEmits(["pickDirection","pickAnimation", "pickAnimationFrame", "setScale"])
 
 function pickDirection(dir) {
     console.log("pickDirection")
@@ -38,18 +36,15 @@ function onClick(event, animationName){
         animationName : animationName,
         pkmnUid: props.pkmn.uid
     })
-    frameNumInput.value.value = "0"
 }
 
-function setAnimationFrame(event, pkmnUid){
-    let frameNum = parseInt(event.target.value)
+function changeAnimationFrame(pkmnUid, delta){
+    let frameNum = props.pkmn.animationTileX + delta
     const activeAnimation = animations.value.get(props.pkmn.animation)
     if (activeAnimation.durations.length <= frameNum) {
         frameNum = 0
-        event.target.value = "0"
     } else if ( frameNum < 0){
         frameNum = activeAnimation.durations.length-1
-        event.target.value = toString(frameNum)
     }
 
     emit("pickAnimationFrame", {
@@ -68,7 +63,20 @@ function setAnimationFrame(event, pkmnUid){
             <DirectionPicker @pick-direction="pickDirection"></DirectionPicker>
         </div>
         <div class="translucent-panel">
-            <div>Pose: [{{ pkmn.animation }}#{{ pkmn.animationTileX }}]</div>
+            <div class="frame-selection">
+                <button @click="changeAnimationFrame(pkmn.uid, -1)">
+                    <i class="icon-angle-down-solid" :style="{
+                        'transform': 'rotate(90deg)'
+                    }"></i>
+                </button>
+                <div>Pose:</div>
+                <div>[{{ pkmn.animation }}#{{ pkmn.animationTileX }}]</div>
+                <button @click="changeAnimationFrame(pkmn.uid, 1)">
+                    <i class="icon-angle-up-solid" :style="{
+                        'transform': 'rotate(90deg)'
+                    }"></i>
+                </button>
+            </div>
         </div>
 
         <div class="animation-dropdown translucent-panel">
@@ -77,11 +85,17 @@ function setAnimationFrame(event, pkmnUid){
                 <div class="animation-tile__name"> {{ name }}</div>
             </div>
         </div>
-        <input ref="frameNumInput" class="frame-input" type="number" @input="setAnimationFrame($event, pkmn.uid)" :value="pkmn.animationTileX">
     </div>
 </template>
 
 <style>
+
+.frame-selection {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content:center;
+    align-items: center;
+}
 
 .translucent-panel{
     background-color: rgba(0,0,0,35%);
@@ -115,5 +129,30 @@ function setAnimationFrame(event, pkmnUid){
     background: none;
     z-index: 11;
 }
+
+.animation-picker input {
+    border: none;
+    background: rgb(0,0,0,25%);
+    color: var(--color-text);
+}
+
+
+.icon-angle-down-solid {
+        mask-image: url('../assets/icon/angle-down-solid.svg');
+        background-color: var(--color-text);
+        mask-repeat: no-repeat;
+        display: block;
+        height: 1rem;
+        width: 1rem;
+    }
+
+.icon-angle-up-solid {
+        mask-image: url('../assets/icon/angle-up-solid.svg');
+        background-color: var(--color-text);
+        mask-repeat: no-repeat;
+        display: block;
+        height: 1rem;
+        width: 1rem;
+    }
 
 </style>

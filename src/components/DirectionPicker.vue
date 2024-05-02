@@ -43,7 +43,7 @@ function onClick(event, dir) {
     }
 
     .direction-picker__button:hover {
-        background: rgba(0,0,0,50%);
+        background: rgba(255,255,255,50%);
     }
 
     .icon-direction-arrow {
