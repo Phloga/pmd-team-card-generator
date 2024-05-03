@@ -18,9 +18,18 @@ const teamName = ref("")
 
 const teamCard = ref(null)
 
+const backgroundImage = ref(null)
+
+const pixelScaleFactor = ref(2)
+
 const cardDimensions = computed(() => {
-    const pixelScaleFactor = 2;
-    return {'width': pixelScaleFactor*props.width + 'px', 'height': pixelScaleFactor*props.height + 'px'}
+    if (backgroundImage.value){
+        const pixelScaleFactor = 2
+        return {'width': pixelScaleFactor*backgroundImage.value.naturalWidth + 'px', 'height': pixelScaleFactor*backgroundImage.value.naturalHeight + 'px'}
+    } else {
+        return {}
+    }
+    //return {'width': pixelScaleFactor*props.width + 'px', 'height': pixelScaleFactor*props.height + 'px'}
 })
 
 function dragoverHandler(event){
@@ -130,7 +139,7 @@ function toggleShiny(uid){
 
 <template>
     <div id="teamCard" ref="teamCard" @dragover="dragoverHandler" @drop="dropHandler" @dragleave="dragLeaveHandler" class="team-card" :style="cardDimensions">
-        <img :src="background" class="team-card__background">
+        <img ref="backgroundImage" :src="background" class="team-card__background">
         <div class="team-card__active-area">
             <template v-for="[uid, pkmn] in placedPkmn" :key="uid">
             <div class="pkmn-sprite" draggable="true" @click="openSpritePicker($event, pkmn.uid)" @dragstart="dragStart($event, pkmn.uid)" @dragend="dragEnd"  :style="{'top': pkmn.positionY+'px', 'left': pkmn.positionX+'px'}">

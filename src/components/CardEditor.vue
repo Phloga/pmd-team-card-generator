@@ -27,16 +27,12 @@ const backgrounds = ref([
         {
             "url" : PMDSkyStartURL,
             "name" : "PMD Sky Start",
-            "style" : "pixelart",
-            "height" : 192,
-            "width" : 256
+            "style" : "pixelart"
         },
         {
             "url" : PMDSkyTitleURL,
             "name" : "PMD Sky Title Screen",
-            "style" : "pixelart",
-            "height" : 192,
-            "width" : 256
+            "style" : "pixelart"
         }
     ])
 
@@ -66,12 +62,29 @@ function generateCardAsPng(event){
         });
 }
 
+function addBackground(file){
+    const reader = new FileReader()
+    reader.onload = function () {
+        const tmp = new Image()
+        tmp.src = reader.result
+
+        const newBackground = {
+            "url" : reader.result,
+            "name" : file.name,
+            "style" : "pixelart"
+        }
+
+        backgrounds.value.push(newBackground)
+    }
+    reader.readAsDataURL(file)
+}
+
 </script>
 
 
 <template>
     <div class="app-root">
-        <BackgroundPicker v-show="backgroundPickerVisible" @close="setBackgroundPickerVisibility(false)" @selected="setBackground" :backgrounds="backgrounds"></BackgroundPicker>
+        <BackgroundPicker v-show="backgroundPickerVisible" @close="setBackgroundPickerVisibility(false)" @selected="setBackground" @added="addBackground" :backgrounds="backgrounds"></BackgroundPicker>
         <TeamCard :background="selectedBackground.url" :width="selectedBackground.width" :height="selectedBackground.height"></TeamCard>
         <div class="md-frame">
             <div class="accordeon">
