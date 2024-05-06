@@ -6,8 +6,8 @@ export const spriteConfigLocation = spritesCollabUri + 'sprite_config.json'
 
 import pkmnDataImport from './pkmn-data.json'
 
-const pmdSpriteCollabBaseUrl = "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/"
-//const pmdSpriteCollabBaseUrl = "/SpriteCollab/"
+//const pmdSpriteCollabBaseUrl = "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/"
+const pmdSpriteCollabBaseUrl = "/SpriteCollab/"
 
 const spriteUrl = pmdSpriteCollabBaseUrl + 'sprite/'
 const portraitUrl = pmdSpriteCollabBaseUrl + 'portrait/'

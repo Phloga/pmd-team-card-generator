@@ -4,10 +4,10 @@ import AnimatedPkmnSprite from './AnimatedPkmnSprite.vue'
 import PkmnPortrait from './PkmnPortrait.vue';
 import EmotionPicker from './EmotionPicker.vue'
 import AnimationPicker from './AnimationPicker.vue';
+import ExplorationTeamRank from './ExplorationTeamRank.vue';
+import {teamRanks} from '../team.ts'
 
 const props = defineProps(["background", "width", "height"])
-
-
 const placedPkmn = ref(new Map())
 
 const pickerPkmnUid = ref(0)
@@ -15,6 +15,8 @@ const pickerType = ref("")
 const pickerPosition = ref([0,0])
 
 const teamName = ref("")
+
+const teamRank = ref(teamRanks.get("sky/normal"))
 
 const teamCard = ref(null)
 
@@ -160,6 +162,9 @@ function toggleShiny(uid){
                 <div class="text-right pmd-font">Team Name</div>
                 <input v-model="teamName" class="pmd-font text-right">
             </div>
+            <div class="team-card__rank">
+                <ExplorationTeamRank :name="teamRank.name" :image="teamRank.image"></ExplorationTeamRank>
+            </div>
         </div>
     </div>
     <div v-show="pickerType != ''" @click="closeActivePicker()" class="background-overlay"></div>
@@ -214,6 +219,13 @@ function toggleShiny(uid){
     position: absolute;
     right: 2%;
     top: 2%;
+}
+
+
+.team-card__rank {
+    position: absolute;
+    right: 2%;
+    bottom: 2%;
 }
 
 .team-card__info input {
