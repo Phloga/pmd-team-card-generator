@@ -1,20 +1,34 @@
 <script setup>
+import { ref, computed } from 'vue';
+
 const props = defineProps({'name': String, 'image': String})
+
+const rankImage = ref(null)
+
+const imageDimensions = computed(() => {
+    if (rankImage.value){
+        const scaleFactor = 2
+        return {'width': scaleFactor*rankImage.value.naturalWidth + 'px', 'height': scaleFactor*rankImage.value.naturalHeight + 'px'}
+    } else {
+        return {}
+    }
+    //return {'width': pixelScaleFactor*props.width + 'px', 'height': pixelScaleFactor*props.height + 'px'}
+})
 
 </script>
 
 <template>
 <div class="team-rank-box">
-    <img :src="image">
-    <div class="pmd-font"> {{ name }}</div>
+    <img ref="rankImage" :src="image" :style="imageDimensions">
+    <!--<div class="pmd-font text-centered"> {{ name }}</div>-->
 </div>
 </template>
 
 <style>
 .team-rank-box {
-    background: var(--color-md-infobox-bg);
     display: flex;
     flex-flow: column nowrap;
+    align-items: center;
 }
 
 .team-rank-box img {

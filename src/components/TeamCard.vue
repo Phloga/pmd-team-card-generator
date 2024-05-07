@@ -5,6 +5,7 @@ import PkmnPortrait from './PkmnPortrait.vue';
 import EmotionPicker from './EmotionPicker.vue'
 import AnimationPicker from './AnimationPicker.vue';
 import ExplorationTeamRank from './ExplorationTeamRank.vue';
+import RankPicker from './RankPicker.vue';
 import {teamRanks} from '../team.ts'
 
 const props = defineProps(["background", "width", "height"])
@@ -26,8 +27,8 @@ const pixelScaleFactor = ref(2)
 
 const cardDimensions = computed(() => {
     if (backgroundImage.value){
-        const pixelScaleFactor = 2
-        return {'width': pixelScaleFactor*backgroundImage.value.naturalWidth + 'px', 'height': pixelScaleFactor*backgroundImage.value.naturalHeight + 'px'}
+        const scaleFactor = pixelScaleFactor.value
+        return {'width': scaleFactor*backgroundImage.value.naturalWidth + 'px', 'height': scaleFactor*backgroundImage.value.naturalHeight + 'px'}
     } else {
         return {}
     }
@@ -106,6 +107,22 @@ function openSpritePicker(event, pkmnUid){
     pickerPosition.value = [event.pageX+30, event.pageY]
 }
 
+function openRankPicker(event) {
+    pickerType.value = 'rank'
+    pickerPkmnUid.value = null
+    const rect = event.target.getBoundingClientRect();
+    pickerPosition.value = [rect.left, rect.top]
+}
+
+function setPixelScale(pickScaleEvent){
+    pixelScaleFactor.value = pickScaleEvent.scale
+}
+
+function onPickRank(pickedRank) {
+    teamRank.value = pickedRank
+    closeActivePicker()
+}
+
 function setDirection(pickDirectionEvent){
     const pkmn = placedPkmn.value.get(pickDirectionEvent.pkmnUid)
     if (pkmn){
@@ -163,13 +180,14 @@ function toggleShiny(uid){
                 <input v-model="teamName" class="pmd-font text-right">
             </div>
             <div class="team-card__rank">
-                <ExplorationTeamRank :name="teamRank.name" :image="teamRank.image"></ExplorationTeamRank>
+                <ExplorationTeamRank :name="teamRank.name" :image="teamRank.image" @click="openRankPicker($event)"></ExplorationTeamRank>
             </div>
         </div>
     </div>
     <div v-show="pickerType != ''" @click="closeActivePicker()" class="background-overlay"></div>
     <EmotionPicker v-if="pickerType=='emotion'" @pick-emotion="onPickEmotion" :positionX="pickerPosition[0]" :positionY="pickerPosition[1]" :pkmn="placedPkmn.get(pickerPkmnUid)"></EmotionPicker>
     <AnimationPicker v-if="pickerType=='animation'" @pick-animation="setAnimation" @pick-animation-frame="setAnimationFrame" @pick-direction="setDirection" :positionX="pickerPosition[0]" :positionY="pickerPosition[1]" :pkmn="placedPkmn.get(pickerPkmnUid)"></AnimationPicker>
+    <RankPicker v-if="pickerType=='rank'" :positionX="pickerPosition[0]" :positionY="pickerPosition[1]" @pick-rank="onPickRank"></RankPicker>
 </template>
 
 <style>
