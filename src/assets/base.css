@@ -27,17 +27,9 @@
 
 /*@media (prefers-color-scheme: dark) {*/
   :root {
-    --color-text-selection-background: #50595d;
-    --color-background: hsl(265, 89%, 11%);
-    --color-background2: hsl(265, 89%, 4%);
-    --color-background-item: hsl(245, 56%, 92%);
-
     --color-button: var(--color-background-item);
     --color-button-hover: hsl(248, 45%, 83%);
     
-    --color-background-critical: hsl(0, 81%, 64%);
-    --color-background-control: hsl(185, 87%, 88%);
-    --color-button-text: var(--color-dark-text);
     --color-text: hsl(45, 88%, 94%);
     --color-text-faded: hsla(45, 88%, 94%, 50%);
     --color-text-lightly-faded: hsla(44, 87%, 94%, 0.74);

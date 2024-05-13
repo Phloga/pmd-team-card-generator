@@ -32,6 +32,7 @@ console.log(teamRanksRef)
     height: 16rem;
     background: rgb(112, 204, 227);
     z-index: 11;
+    box-shadow: 1px;
 }
 
 .rank-dropdown__entry {

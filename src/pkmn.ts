@@ -4,6 +4,7 @@ export const spritesLocation = spritesCollabUri + 'sprite'
 export const portraitsLocation = spritesCollabUri + 'portrait'
 export const spriteConfigLocation = spritesCollabUri + 'sprite_config.json'
 
+import type { StringMappingType } from 'typescript'
 import pkmnDataImport from './pkmn-data.json'
 
 //const pmdSpriteCollabBaseUrl = "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/"
@@ -12,10 +13,30 @@ const pmdSpriteCollabBaseUrl = "/SpriteCollab/"
 const spriteUrl = pmdSpriteCollabBaseUrl + 'sprite/'
 const portraitUrl = pmdSpriteCollabBaseUrl + 'portrait/'
 
+//const spriteCollabPokemonsUrl = "https://raw.githubusercontent.com/PMDCollab/SpriteViewer/main/resources/pokemons.json"
+const spriteCollabPokemonsUrl = "/pokemons.json"
+
 //const creditsPath = pmdSpriteCollabBaseUrl + "credit_names.txt"
+
 
 function zeroPad(num:number){
     return String(num).padStart(4, '0')
+}
+
+function fallbackAnimation(pkmnId: number, formId:string){
+    const base = formId.substring(0,4);
+    const mods = formId.substring(4);
+    if (mods.length > 0) {
+        return {pkmnId: pkmnId, formId: base+mods.slice(1)}
+    } 
+    else if (formId != "0000"){
+        return {pkmnId: pkmnId, formId: "0000"}
+    }
+    else if (pkmnId != 0) {
+        return {pkmnId: 0, formId: "0000"}
+    } else {
+        return {pkmnId: 0 , formId: null}
+    }
 }
 
 class PkmnFactory {
@@ -43,12 +64,12 @@ export let pkmnFactory = new PkmnFactory()
 class PkmnSpritePlacement {
     uid: number
     pkmnId: number
+    formId: string
     animation: string
     positionX: number
     positionY: number
     name: string
     emotion: string
-    shiny: boolean
     animationTileX: number
     animationTileY: number
     maxAnimationTileX: number
@@ -61,48 +82,47 @@ class PkmnSpritePlacement {
         this.positionY = positionY
         this.name = name
         this.emotion = emotion
-        this.shiny = false
         this.animationTileX = 0
         this.animationTileY = 0
         this.maxAnimationTileX = 0
+        this.formId = '0000'
     }
 
     setDirection(dir : number){
         this.animationTileY = dir
     }
-    
-    toggleShiny(){
-        this.shiny = !this.shiny
-    }
 }
 
 class PkmnDataRepository {
     pkmnData : any
+    pkmnMap: Map<string, any>
     animations: Map<string,any>
+    credits: Map<string, any>
+    creditsNames: Map<string, {name: string, contact:string}>
 
     constructor(){
-        this.pkmnData = pkmnDataImport;
-        this.animations = new Map();
+        this.pkmnData = pkmnDataImport
+        this.animations = new Map()
+        this.credits = new Map()
+        this.creditsNames = new Map()
+        this.pkmnMap = new Map()
     }
 
-    pkmnIds() {
-        return this.pkmnData.spriteData.map( (rec: any) => parseInt(rec.id)).filter((v: any) => v != 0)
+    async fetchPkmnIds() {
+        const pkmns = await this.fetchPokemonMap()
+        return Array.from(pkmns.keys()).map((pkmnIx: any) => parseInt(pkmnIx))
     }
 
     getLanguages() {
         return this.pkmnData.languages
     }
 
-    compositeKey(pkmnId : number, shiny:boolean){
-        let key = pkmnId.toString()
-        if (shiny){
-            key = key + "s"
-        }
-        return key
+    compositeKey(pkmnId : number, formId:string){
+        return pkmnId.toString() + '-' + formId
     }
 
-    getPreloadedAnimData(pkmnId:number, shiny=false){
-        return this.animations.get(this.compositeKey(pkmnId, shiny))
+    getPreloadedAnimData(pkmnId:number, formId:string){
+        return this.animations.get(this.compositeKey(pkmnId, formId))
     }
 
     getPortraitEmotions() {
@@ -113,30 +133,65 @@ class PkmnDataRepository {
         return this.pkmnData.spriteConfig.portrait_size
     }
 
-    variantPath(basePath:string, shiny:boolean, form:number = 0) {
-        let path = basePath
-        
-        if (shiny) {
-            if (form == 0){
-                path = path + "/0000/0001"
-            } else {
-                path = path + "/0001"
-            }
+    hasForm(pkmnId:number, formId:string){
+        return this.pkmnMap.get(zeroPad(pkmnId)).forms[formId] != null
+    }
+
+    hasFemaleForm(pkmnId:number, baseFormId:string){
+        return this.hasForm(pkmnId, baseFormId+'f')
+    }
+
+    hasShinyForm(pkmnId:number, baseFormId:string){
+        return this.hasForm(pkmnId, baseFormId+'s')
+    }
+
+    getForm(pkmnId:number, formId:string) : {name: string, path: string}{
+        const form = this.pkmnMap.get(zeroPad(pkmnId)).forms[formId];
+        return {
+            name: form.name,
+            path: form.botPath
         }
-        return path
     }
 
-    getPortraitPath(pkmnId:number, emotion:string, shiny:boolean) {
-        let base = portraitUrl + zeroPad(pkmnId)
-        return this.variantPath(base, shiny) + "/" + emotion + ".png"
+    getFormsList(pkmnId:number){
+        const sPkmnId = zeroPad(pkmnId)
+        if (!this.pkmnMap.has(sPkmnId)) {
+            return []
+        }
+
+        const forms : Array<[string, {name: string, botPath: string}]> = Object.entries(this.pkmnMap.get(zeroPad(pkmnId)).forms)
+        return forms.map(([key,value]) => {
+                return {
+                    formId: key,
+                    name: value.name,
+                    path: value.botPath
+                }
+            }
+        )
     }
 
-    hasAnimData(pkmnId:number, shiny=false){
-        return this.animations.has(this.compositeKey(pkmnId, shiny))
+
+    formPath(pkmnId:number , formId:string, portrait:boolean){
+        const path = this.pkmnMap.get(zeroPad(pkmnId)).forms[formId].botPath
+        //TODO handle missing sprites portraits
+
+        if (portrait)
+            return portraitUrl.slice(0, -1) + path
+        else
+            return spriteUrl.slice(0, -1) + path
     }
 
-    getAnimData(pkmnId:number, shiny=false){
-        return this.animations.get(this.compositeKey(pkmnId, shiny))
+    getPortraitPath(pkmnId:number, formId:string, emotion:string) {
+        console.log(formId)
+        return this.formPath(pkmnId, formId, true) + emotion + ".png"
+    }
+
+    hasAnimData(pkmnId:number, formId:string){
+        return this.animations.has(this.compositeKey(pkmnId, formId))
+    }
+
+    getAnimData(pkmnId:number, formId:string){
+        return this.animations.get(this.compositeKey(pkmnId, formId))
     }
 
     parseAnimData(animData: Document, animRoot: string){
@@ -189,22 +244,103 @@ class PkmnDataRepository {
         return newAnimationSet
     }
 
-    async fetchAnimData(pkmnId:number, shiny=false){
-        const pkmnKey = this.compositeKey(pkmnId, shiny)
-        if (!this.animations.has(pkmnKey)){
-            const animRoot = this.variantPath(spriteUrl + zeroPad(pkmnId), shiny)
-            const response = await fetch(animRoot + "/AnimData.xml")
+    async fetchPokemonMap() {
+        if (this.pkmnMap.size != 0) {
+            return this.pkmnMap
+        }
+
+        const pokemons = await fetch(spriteCollabPokemonsUrl).then((response)=> response.json());
+
+        for (const pix in pokemons){
+            this.pkmnMap.set(pix, {
+                name : pokemons[pix],
+                forms : pokemons[pix].forms
+            })
+        }
+        return this.pkmnMap
+    }
+
+    async fetchAnimData(prefPkmnId:number, prefFormId:string){
+        let pkmnId = prefPkmnId
+        let formId : string | null = prefFormId
+        const pkmnKey = this.compositeKey(prefPkmnId, prefFormId)
+        while (formId != null && !this.animations.has(pkmnKey)){
+            //const animRoot = this.variantPath(spriteUrl + zeroPad(pkmnId), shiny)
+            if (!this.hasForm(pkmnId, formId)) {
+                ({pkmnId, formId} = fallbackAnimation(pkmnId, formId))
+                continue
+            }
+            
+            const animRoot = this.formPath(pkmnId, formId, false)
+            const response = await fetch(animRoot + "AnimData.xml")
+            
+            if (!response.ok){
+                //console.log("status " + response.status + " for " + animRoot + "AnimData.xml" )
+                ({pkmnId, formId} = fallbackAnimation(pkmnId, formId))
+                continue
+            }
             const xmlText = await response.text()
             const parser = new DOMParser()
+
             const animData = parser.parseFromString(xmlText, "text/xml")
-        
-            const errorNode = animData.querySelector("parsererror")!;
-            if (errorNode) {
-                throw new Error("Failed to Parse " + animRoot + "/AnimData.xml\nerrorNode:\n" + errorNode)
+    
+            const errorNode = animData.querySelector("parsererror");
+            if (errorNode != null) {
+                ({pkmnId, formId} = fallbackAnimation(pkmnId, formId))
+                continue
             }
             this.animations.set(pkmnKey, this.parseAnimData(animData, animRoot))
         }
-        return this.getAnimData(pkmnId, shiny) //this returns a map
+        if (formId == null){
+            throw new Error("Failed to retrieve any fallback sprites")
+        }
+        return this.getAnimData(prefPkmnId, prefFormId) //this returns a map
+    }
+
+    parseCreditNames(txt:string) {
+        const credits = new Map<string, {name: string, contact:string}>()
+        let i = 0
+        let j = 0
+        while ((j = txt.indexOf('\n', i)) !== -1) {
+            const line = txt.substring(i, j).split(' ');
+            i = j + 1;
+            if (line.length < 3) {
+                line.push('')
+            }
+            credits.set(line[1], {name: line[0], contact: line[2]})
+        }
+        return credits
+    }
+
+    parseCredits(txt:string){
+        const credits = new Array<{timestamp: string, handle: string}>()
+        let i = 0
+        let j = 0
+        while ((j = txt.indexOf('\n', i)) !== -1) {
+            const line = txt.substring(i, j).split(' ');
+            i = j + 1;
+            credits.push({timestamp: line[0], handle: line[1]})
+        }
+        return credits
+    }
+
+    async fetchCreditsNames(){
+        if (this.creditsNames.size == 0){
+            const names = await fetch(pmdSpriteCollabBaseUrl + 'credit_names.txt')
+            this.creditsNames = this.parseCreditNames(await names.text())
+        }
+        return this.creditsNames
+    }
+
+    async fetchCredits(pkmnId:number, formId:string) {
+        const pkmnKey = this.compositeKey(pkmnId, formId)
+        if (!this.credits.has(pkmnKey)){
+            const animRoot = this.formPath(pkmnId,formId,false)
+            const response = await fetch(animRoot + "/credits.txt")
+            const text = await response.text()
+            this.credits.set(pkmnKey, this.parseCredits(text))
+        }
+        return this.credits.get(pkmnKey)
     }
 }
 

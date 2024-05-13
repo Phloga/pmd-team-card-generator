@@ -6,6 +6,7 @@ import EmotionPicker from './EmotionPicker.vue'
 import AnimationPicker from './AnimationPicker.vue';
 import ExplorationTeamRank from './ExplorationTeamRank.vue';
 import RankPicker from './RankPicker.vue';
+import FormPicker from './FormPicker.vue';
 import {teamRanks} from '../team.ts'
 
 const props = defineProps(["background", "width", "height"])
@@ -46,7 +47,6 @@ function dragLeaveHandler(event){
 }
 
 function dropHandler(event){
-    console.log(event.dataTransfer.getData("pkmn"))
     const rootRect = teamCard.value.getBoundingClientRect()
     const pkmnData = event.dataTransfer.getData("pkmn")
     const rectData = event.dataTransfer.getData("rect")
@@ -92,19 +92,18 @@ function onPickEmotion(pickEmotionEvent) {
 function closeActivePicker(){
     pickerType.value = ""
 }
-
-function openEmotionPicker(event, pkmnUid){
-    pickerType.value = "emotion"
-    pickerPkmnUid.value = pkmnUid
-    const rect = event.target.getBoundingClientRect();
-    pickerPosition.value = [rect.left, rect.top]
-}
-
 function openSpritePicker(event, pkmnUid){
     pickerType.value ='animation'
     pickerPkmnUid.value = pkmnUid
     //const rect = event.target.getBoundingClientRect();
     pickerPosition.value = [event.pageX+30, event.pageY]
+}
+
+function openPkmnSpecificPicker(event, pkmnUid, ptype){
+    pickerType.value = ptype
+    pickerPkmnUid.value = pkmnUid
+    const rect = event.target.getBoundingClientRect();
+    pickerPosition.value = [rect.left, rect.top]
 }
 
 function openRankPicker(event) {
@@ -114,12 +113,22 @@ function openRankPicker(event) {
     pickerPosition.value = [rect.left, rect.top]
 }
 
+
+
 function setPixelScale(pickScaleEvent){
     pixelScaleFactor.value = pickScaleEvent.scale
 }
 
 function onPickRank(pickedRank) {
     teamRank.value = pickedRank
+    closeActivePicker()
+}
+
+function onPickForm(pickedFormId) {
+    const pkmn = placedPkmn.value.get(pickerPkmnUid.value)
+    if (pkmn){
+        pkmn.formId = pickedFormId
+    }
     closeActivePicker()
 }
 
@@ -162,16 +171,16 @@ function toggleShiny(uid){
         <div class="team-card__active-area">
             <template v-for="[uid, pkmn] in placedPkmn" :key="uid">
             <div class="pkmn-sprite" draggable="true" @click="openSpritePicker($event, pkmn.uid)" @dragstart="dragStart($event, pkmn.uid)" @dragend="dragEnd"  :style="{'top': pkmn.positionY+'px', 'left': pkmn.positionX+'px'}">
-                <AnimatedPkmnSprite :pkmnId="pkmn.pkmnId" :animation="pkmn.animation" :start="pkmn.animationTileX" :direction="pkmn.animationTileY" :shiny="pkmn.shiny" :pixel-size="2"/>
+                <AnimatedPkmnSprite :pkmnId="pkmn.pkmnId" :formId="pkmn.formId" :animation="pkmn.animation" :start="pkmn.animationTileX" :direction="pkmn.animationTileY" :shiny="pkmn.shiny" :pixel-size="2"/>
             </div>
             </template>
             <div class="team-list">
                 <div v-for="[uid, pkmn] in placedPkmn" :key="uid" class="team-member">
-                    <button @click="openEmotionPicker($event, pkmn.uid)" class="clickable_portrait">
-                        <PkmnPortrait :pkmnId="pkmn.pkmnId" :emotion="pkmn.emotion" :shiny="pkmn.shiny"></PkmnPortrait>
+                    <button @click="openPkmnSpecificPicker($event, pkmn.uid, 'emotion')" class="clickable_portrait">
+                        <PkmnPortrait :pkmnId="pkmn.pkmnId" :formId="pkmn.formId" :emotion="pkmn.emotion" :shiny="pkmn.shiny"></PkmnPortrait>
                     </button>
                     <input>
-                    <i class="icon-shiny team-member__toggle_shiny" @click="toggleShiny(uid)"></i>
+                    <i class="icon-shiny team-member__toggle_shiny" @click="openPkmnSpecificPicker($event, uid, 'form')"></i>
                     <i class="icon-xcross team-member__remove" @click="removeTeamMember(uid)"></i>
                 </div>
             </div>
@@ -188,6 +197,7 @@ function toggleShiny(uid){
     <EmotionPicker v-if="pickerType=='emotion'" @pick-emotion="onPickEmotion" :positionX="pickerPosition[0]" :positionY="pickerPosition[1]" :pkmn="placedPkmn.get(pickerPkmnUid)"></EmotionPicker>
     <AnimationPicker v-if="pickerType=='animation'" @pick-animation="setAnimation" @pick-animation-frame="setAnimationFrame" @pick-direction="setDirection" :positionX="pickerPosition[0]" :positionY="pickerPosition[1]" :pkmn="placedPkmn.get(pickerPkmnUid)"></AnimationPicker>
     <RankPicker v-if="pickerType=='rank'" :positionX="pickerPosition[0]" :positionY="pickerPosition[1]" @pick-rank="onPickRank"></RankPicker>
+    <FormPicker v-if="pickerType=='form'" :pkmn-id="placedPkmn.get(pickerPkmnUid).pkmnId" :positionX="pickerPosition[0]" :positionY="pickerPosition[1]" @pick-form="onPickForm"></FormPicker>
 </template>
 
 <style>

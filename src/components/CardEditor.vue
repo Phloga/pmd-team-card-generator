@@ -1,6 +1,6 @@
 <script setup>
 
-import {ref, computed} from 'vue'
+import {ref, computed, onMounted} from 'vue'
 
 import SearchablePkmnGrid from './SearchablePkmnGrid.vue'
 import TeamCard from './TeamCard.vue'
@@ -14,14 +14,16 @@ import PMDSkyTitleURL from '../assets/card-backgrounds/PMD Sky Title Screen BG.p
 
 import {pkmnDataRepository} from '../pkmn.ts'
 
-
+/*
 const pkmnIds = computed(() => {
     return pkmnDataRepository.pkmnIds()
+})*/
+const pkmnIds = ref(new Array())
+onMounted(async () => {
+    pkmnIds.value = await pkmnDataRepository.fetchPkmnIds()
 })
 
 const pkmnSearchString = ref("")
-
-const selectedPkmn = ref([])
 
 const backgrounds = ref([
         {

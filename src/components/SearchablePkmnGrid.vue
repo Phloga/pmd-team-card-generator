@@ -18,7 +18,7 @@ const displayPkmnList = computed(() => {
             displayName: name,
             searchName: pkmnId + " " + name.toUpperCase()
         }
-    })
+    }).sort((a,b) => a.id > b.id)
 })
 
 const filteredPkmnSet = computed(() => {

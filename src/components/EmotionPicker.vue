@@ -8,7 +8,7 @@ const emit = defineEmits(["pickEmotion"])
 const emotions = ref(pkmnDataRepository.getPortraitEmotions())
 
 
-function pickEmotion(event, pkmnUid, emotion){
+function pickEmotion(pkmnUid, emotion){
     emit("pickEmotion", {
         emotion: emotion,
         pkmnUid: pkmnUid
@@ -21,7 +21,7 @@ function pickEmotion(event, pkmnUid, emotion){
 <template>
     <div class="dropdown" :style="{'top': positionY+'px', 'left': positionX+'px'}">
         <div v-for="emo,i in emotions" class="dropdown__entry" :key="i">
-            <img :src="pkmnDataRepository.getPortraitPath(props.pkmn.pkmnId, emo, props.pkmn.shiny)" @click="pickEmotion($event, props.pkmn.uid, emo)">
+            <img :src="pkmnDataRepository.getPortraitPath(props.pkmn.pkmnId, props.pkmn.formId, emo, props.pkmn.shiny)" @click="pickEmotion(props.pkmn.uid, emo)">
             <div>{{emo}}</div>
         </div>
     </div>

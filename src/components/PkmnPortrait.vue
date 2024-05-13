@@ -6,11 +6,12 @@ import {pkmnDataRepository} from '../pkmn.ts'
 
 const props = defineProps({
     "pkmnId" : { type: Number, required:true}, 
+    "formId" : { type: String, default: "0000"},
     "emotion" : { type: String, default: "Normal"}, 
     "shiny" : { type: Boolean, default: false }})
 
 const portraitPath = computed(() => {
-    return pkmnDataRepository.getPortraitPath(props.pkmnId, props.emotion, props.shiny)
+    return pkmnDataRepository.getPortraitPath(props.pkmnId, props.formId, props.emotion, props.shiny)
 })
 
 const portraitSize = ref(pkmnDataRepository.getPortraitSize())

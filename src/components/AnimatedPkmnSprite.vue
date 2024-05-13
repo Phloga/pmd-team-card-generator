@@ -6,6 +6,7 @@ import {pkmnDataRepository} from '../pkmn.ts'
 
 const props = defineProps({
     "pkmnId" : Number, 
+    "formId" : {type: String, default: "0000"},
     "shiny" : {type: Boolean, default: false},
     "animation" : String, 
     "direction" : Number, 
@@ -33,16 +34,16 @@ const activeAnimation = computed(() => {
 const sprite = ref(null)
 const spriteContainer = ref(null)
 
-async function fetchAnimations(pkmnId, shiny){
-    animations.value = await pkmnDataRepository.fetchAnimData(pkmnId,shiny)
+async function fetchAnimations(pkmnId, formId){
+    animations.value = await pkmnDataRepository.fetchAnimData(pkmnId,formId)
 }
 
 watch(() => props.pkmnId, async (newPkmnId, oldPkmnId) => {
-    fetchAnimations(newPkmnId, props.shiny)
+    fetchAnimations(newPkmnId, props.formId)
 })
 
-watch(() => props.shiny, async (newShiny, oldShiny) => {
-    fetchAnimations(props.pkmnId, newShiny)
+watch(() => props.formId, async (newFormId, oldFormId) => {
+    fetchAnimations(props.pkmnId, newFormId)
 })
 
 
@@ -52,7 +53,7 @@ onMounted(() => {
     } else {
         intersectionObserver = new IntersectionObserver((entries) => {
             if (entries[0].intersectionRatio <= 0) return;
-            fetchAnimations(props.pkmnId)
+            fetchAnimations(props.pkmnId, props.formId)
             intersectionObserver.unobserve(entries[0].target);
             intersectionObserver = null
         });

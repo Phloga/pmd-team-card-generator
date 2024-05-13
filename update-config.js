@@ -4,7 +4,7 @@ import fs from 'fs';
 const spritesLocation = './SpriteCollab/sprite'
 
 const pkmnNameTranslationSource = "./pokemon-names/data"
-
+const pkmnJsonUrl = "https://raw.githubusercontent.com/PMDCollab/SpriteViewer/main/resources/pokemons.json"
 
 
 const spriteConfigImport = await import('./SpriteCollab/sprite_config.json' , {
@@ -36,4 +36,6 @@ await fs.promises.writeFile("./src/pkmn-data.json", JSON.stringify(config))
 
 const promises = languagesDir.map((file) => fs.promises.copyFile(pkmnNameTranslationSource + '/' + file, "./src/assets/pkmn-names/" + file))
 
-console.log(config)
+fetch(pkmnJsonUrl).then((response) => {
+  return fs.promises.writeFile('public/pokemons.json',response.body)
+})

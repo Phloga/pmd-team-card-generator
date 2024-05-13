@@ -24,11 +24,11 @@ function pickDirection(dir) {
 const animations = ref(new Map())
 
 watch(() => props.pkmn, async () => {
-    animations.value = await pkmnDataRepository.fetchAnimData(props.pkmn.pkmnId)
+    animations.value = await pkmnDataRepository.fetchAnimData(props.pkmn.pkmnId, props.pkmn.formId)
 })
 
 onMounted(async () => {
-    animations.value = await pkmnDataRepository.fetchAnimData(props.pkmn.pkmnId)
+    animations.value = await pkmnDataRepository.fetchAnimData(props.pkmn.pkmnId, props.pkmn.formId)
 })
 
 function onClick(event, animationName){
@@ -81,7 +81,7 @@ function changeAnimationFrame(pkmnUid, delta){
 
         <div class="animation-dropdown translucent-panel">
             <div v-for="[name, _anim] in animations" :key="name" @click="onClick($event, name)" class="animation-tile">
-                <AnimatedPkmnSprite :pkmnId="pkmn.pkmnId" :animation="name" :direction="0"/>
+                <AnimatedPkmnSprite :pkmnId="pkmn.pkmnId" :formId="pkmn.formId" :animation="name" :direction="0"/>
                 <div class="animation-tile__name"> {{ name }}</div>
             </div>
         </div>
