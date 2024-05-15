@@ -7,7 +7,9 @@ import AnimationPicker from './AnimationPicker.vue';
 import ExplorationTeamRank from './ExplorationTeamRank.vue';
 import RankPicker from './RankPicker.vue';
 import FormPicker from './FormPicker.vue';
+import SpriteInfoBox from './SpriteInfoBox.vue';
 import {teamRanks} from '../team'
+import { pkmnFactory } from '@/pkmn';
 
 const props = defineProps(["background", "width", "height"])
 const placedPkmn = ref(new Map())
@@ -15,6 +17,13 @@ const placedPkmn = ref(new Map())
 const pickerPkmnUid = ref(0)
 const pickerType = ref("")
 const pickerPosition = ref([0,0])
+
+const pointerIsOverInfoBox = ref(false)
+const pointerIsOverSprite = ref(false)
+const infoBoxPosition = ref([0,0])
+const infoBoxPkmn = ref(pkmnFactory.placeholderPkmn())
+
+const infoBoxVisiblity = computed (() => pickerType.value =='' && (pointerIsOverInfoBox.value || pointerIsOverSprite.value))
 
 const teamName = ref("")
 
@@ -70,15 +79,7 @@ function dragStart(event, uid){
     //const dragImage = event.target.getElementsByClassName('sprite-container')[0]
     //event.dataTransfer.setDragImage(dragImage, 0, -movedPkmn.animationTileY)
     event.dataTransfer.setData('pkmn', JSON.stringify(movedPkmn))
-    event.dataTransfer.setData('rect', JSON.stringify(event.target.getBoundingClientRect()))
-}
-
-function dragEnd(event) {
-    const pkmnData = event.dataTransfer.getData("pkmn")
-    if (pkmnData != null && event.dataTransfer.dropEffect == "none"){
-        const uid = JSON.parse(pkmnData).uid
-        placedPkmn.value.delete(uid)
-    }
+    event.dataTransfer.setData('rect', JSON.stringify(event.currentTarget.getBoundingClientRect()))
 }
 
 function onPickEmotion(pickEmotionEvent) {
@@ -158,9 +159,23 @@ function removeTeamMember(uid){
     placedPkmn.value.delete(uid)
 }
 
-function toggleShiny(uid){
-    const pkmn = placedPkmn.value.get(uid)
-    pkmn.shiny = !pkmn.shiny
+function onSpriteMouseOver(event, pkmnUid){
+    const rect = event.currentTarget.getBoundingClientRect();
+    infoBoxPosition.value = [rect.right + window.scrollX , rect.top + scrollY ]
+    pointerIsOverSprite.value = true
+    infoBoxPkmn.value = placedPkmn.value.get(pkmnUid)
+}
+
+function onInfoBoxMouseOver(){
+    pointerIsOverInfoBox.value = true
+}
+
+function onInfoBoxMouseLeave(){
+    pointerIsOverInfoBox.value = false
+}
+
+function onSpriteMouseLeave(){
+    pointerIsOverSprite.value = false
 }
 
 </script>
@@ -168,13 +183,17 @@ function toggleShiny(uid){
 <template>
     <div id="teamCard" ref="teamCard" @dragover="dragoverHandler" @drop="dropHandler" @dragleave="dragLeaveHandler" class="team-card" :style="cardDimensions">
         <img ref="backgroundImage" :src="background" class="team-card__background">
-        <div class="team-card__active-area">
+        <div class="team-card__sprite-area">
             <template v-for="[uid, pkmn] in placedPkmn" :key="uid">
-            <div class="pkmn-sprite" draggable="true" @click="openSpritePicker($event, pkmn.uid)" @dragstart="dragStart($event, pkmn.uid)" @dragend="dragEnd"  :style="{'top': pkmn.positionY+'px', 'left': pkmn.positionX+'px'}">
-                <AnimatedPkmnSprite :pkmnId="pkmn.pkmnId" :formId="pkmn.formId" :animation="pkmn.animation" :start="pkmn.animationTileX" :direction="pkmn.animationTileY" :shiny="pkmn.shiny" :pixel-size="2"/>
+            <div class="pkmn" :style="{'top': pkmn.positionY+'px', 'left': pkmn.positionX+'px'}" @mouseleave="onSpriteMouseLeave" @mouseover="onSpriteMouseOver($event, pkmn.uid)">
+                <div class="pkmn-sprite" draggable="true" @click="openSpritePicker($event, pkmn.uid)" @dragstart="dragStart($event, pkmn.uid)">
+                    <AnimatedPkmnSprite :pkmnId="pkmn.pkmnId" :formId="pkmn.formId" :animation="pkmn.animation" :start="pkmn.animationTileX" :direction="pkmn.animationTileY" :shiny="pkmn.shiny" :pixel-size="2"/>
+                </div>
+                <SpriteInfoBox class="pkmn-info-box" :pkmn="pkmn"></SpriteInfoBox>
             </div>
             </template>
-            <div class="team-list">
+        </div>
+        <div class="team-card__team-member-list">
                 <div v-for="[uid, pkmn] in placedPkmn" :key="uid" class="team-member">
                     <button @click="openPkmnSpecificPicker($event, pkmn.uid, 'emotion')" class="clickable_portrait">
                         <PkmnPortrait :pkmnId="pkmn.pkmnId" :formId="pkmn.formId" :emotion="pkmn.emotion" :shiny="pkmn.shiny"></PkmnPortrait>
@@ -184,13 +203,12 @@ function toggleShiny(uid){
                     <i class="icon-xcross team-member__remove" @click="removeTeamMember(uid)"></i>
                 </div>
             </div>
-            <div class="team-card__info">
-                <div class="text-right pmd-font">Team Name</div>
-                <input v-model="teamName" class="pmd-font text-right">
-            </div>
-            <div class="team-card__rank">
-                <ExplorationTeamRank :name="teamRank.name" :image="teamRank.image" @click="openRankPicker($event)"></ExplorationTeamRank>
-            </div>
+        <div class="team-card__info">
+            <div class="text-right pmd-font">Team Name</div>
+            <input v-model="teamName" class="pmd-font text-right">
+        </div>
+        <div class="team-card__rank">
+            <ExplorationTeamRank :name="teamRank.name" :image="teamRank.image" @click="openRankPicker($event)"></ExplorationTeamRank>
         </div>
     </div>
     <div v-show="pickerType != ''" @click="closeActivePicker()" class="background-overlay"></div>
@@ -235,7 +253,7 @@ function toggleShiny(uid){
     left: 0;
 }
 
-.team-card__active-area {
+.team-card__sprite-area {
     position: absolute;
     top: 0;
     left: 0;
@@ -278,8 +296,10 @@ function toggleShiny(uid){
     padding: 0;
 }
 
-.team-list {
-    position: relative;
+.team-card__team-member-list {
+    position: absolute;
+    top: 0%;
+    left: 0%;
     display: flex;
     flex-flow: column nowrap;
     padding: 20px;
@@ -325,13 +345,25 @@ function toggleShiny(uid){
     background-color: red;
 }
 
+.pkmn {
+    position: absolute;
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    z-index: 1;
+}
 
+.pkmn-info-box {
+    display: none;
+}
+
+.pkmn:hover .pkmn-info-box {
+    display: block;
+}
 
 .pkmn-sprite {
     image-rendering: pixelated;
     overflow: hidden;
-    position: absolute;
-    z-index: 1;
 }
 
 </style>

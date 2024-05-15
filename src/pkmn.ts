@@ -40,9 +40,15 @@ function fallbackAnimation(pkmnId: number, formId:string){
 
 class PkmnFactory {
     counter: number
+    placeholder: PkmnSpritePlacement
 
     constructor() {
         this.counter = 0
+        this.placeholder = new PkmnSpritePlacement(-1, 0, "", "Normal", "Normal", 0, 0)
+    }
+
+    placeholderPkmn() {
+        return this.placeholder
     }
 
     makePkmn(name: string, pkmnId : number, animation : string, positionX : number, positionY : number){
@@ -57,8 +63,6 @@ class PkmnFactory {
         return newPkmn
     }
 }
-
-export let pkmnFactory = new PkmnFactory()
 
 class PkmnSpritePlacement {
     uid: number
@@ -342,6 +346,8 @@ class PkmnDataRepository {
         return this.credits.get(pkmnKey)
     }
 }
+
+export let pkmnFactory = new PkmnFactory()
 
 export {PkmnSpritePlacement}
 export let pkmnDataRepository = new PkmnDataRepository();

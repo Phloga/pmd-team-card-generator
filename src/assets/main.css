@@ -92,6 +92,27 @@ button:active{
   z-index: -100;
 }
 
+.pmd-framed-box {
+  background-color: var(--color-md-textbox-bg);
+  border-width: 0.5rem;
+  border-style: groove ridge ridge groove;
+  border-color: var(--color-md-textbox-i1);
+  outline: var(--color-md-textbox-o1) solid 0.25rem;
+  border-radius: 0.5rem;
+  margin: 0.25rem;
+}
+
+.pmd-framed-box--small {
+  background-color: var(--color-md-textbox-bg);
+  border-width: 0.33rem;
+  border-style: groove ridge ridge groove;
+  border-color: var(--color-md-textbox-i1);
+  outline: var(--color-md-textbox-o1) solid 0.20rem;
+  border-radius: 0.33rem;
+  margin: 0.15rem;
+}
+
+
 
 @font-face {
   font-family: wondermail;
