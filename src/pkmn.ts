@@ -4,7 +4,6 @@ export const spritesLocation = spritesCollabUri + 'sprite'
 export const portraitsLocation = spritesCollabUri + 'portrait'
 export const spriteConfigLocation = spritesCollabUri + 'sprite_config.json'
 
-import type { StringMappingType } from 'typescript'
 import pkmnDataImport from './pkmn-data.json'
 
 //const pmdSpriteCollabBaseUrl = "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/"
@@ -46,8 +45,8 @@ class PkmnFactory {
         this.counter = 0
     }
 
-    makePkmn(pkmnId : number, animation : string, positionX : number, positionY : number){
-        const newPkmn = new PkmnSpritePlacement(this.counter, pkmnId, "", animation, "Normal", positionX, positionY)
+    makePkmn(name: string, pkmnId : number, animation : string, positionX : number, positionY : number){
+        const newPkmn = new PkmnSpritePlacement(this.counter, pkmnId, name, animation, "Normal", positionX, positionY)
         ++this.counter 
         return newPkmn
     }
@@ -344,4 +343,5 @@ class PkmnDataRepository {
     }
 }
 
+export {PkmnSpritePlacement}
 export let pkmnDataRepository = new PkmnDataRepository();

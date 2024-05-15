@@ -44,7 +44,7 @@ function onDragStartHandler(event, pkmnId){
     //event.dataTransfer.setDragImage(new Image(0,0), 0, 0)
     const dragImage = event.target.getElementsByClassName('sprite-container')[0]
     event.dataTransfer.setDragImage(dragImage, 0, 0)
-    const data = JSON.stringify(pkmnFactory.makePkmn(pkmnId, "Idle", 0, 0));
+    const data = JSON.stringify(pkmnFactory.makePkmn(t("names.pkmn" + pkmnId), pkmnId, "Idle", 0, 0));
     event.dataTransfer.setData("pkmn", data);
 }
 

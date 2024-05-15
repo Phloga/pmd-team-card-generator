@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue';
-import {teamRanks} from '../team.ts'
+import {teamRanks} from '../team.js'
 
 const props = defineProps(["positionY", "positionX"])
 const emit = defineEmits(["pickRank"])

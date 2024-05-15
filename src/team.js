@@ -5,7 +5,7 @@ const skyTeamRankImports = import.meta.glob('./assets/team-ranks/sky/*.png', { e
 const teamRanksMap = new Map();
 
 
-function asRankSprite(rankName: string, rankGroup: string, data: any){
+function asRankSprite(rankName, rankGroup, data){
     return {
         name: rankName,
         group: rankGroup,

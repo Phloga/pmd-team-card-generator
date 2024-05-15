@@ -7,7 +7,7 @@ import AnimationPicker from './AnimationPicker.vue';
 import ExplorationTeamRank from './ExplorationTeamRank.vue';
 import RankPicker from './RankPicker.vue';
 import FormPicker from './FormPicker.vue';
-import {teamRanks} from '../team.ts'
+import {teamRanks} from '../team'
 
 const props = defineProps(["background", "width", "height"])
 const placedPkmn = ref(new Map())
@@ -179,7 +179,7 @@ function toggleShiny(uid){
                     <button @click="openPkmnSpecificPicker($event, pkmn.uid, 'emotion')" class="clickable_portrait">
                         <PkmnPortrait :pkmnId="pkmn.pkmnId" :formId="pkmn.formId" :emotion="pkmn.emotion" :shiny="pkmn.shiny"></PkmnPortrait>
                     </button>
-                    <input>
+                    <input v-model="pkmn.name">
                     <i class="icon-shiny team-member__toggle_shiny" @click="openPkmnSpecificPicker($event, uid, 'form')"></i>
                     <i class="icon-xcross team-member__remove" @click="removeTeamMember(uid)"></i>
                 </div>
