@@ -1,17 +1,42 @@
 <script setup>
 import { PkmnSpritePlacement, pkmnDataRepository } from '@/pkmn';
-import { computed } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 
 const props = defineProps({
     "pkmn" : {type:PkmnSpritePlacement, required:true}
 })
 
+const spriteCreator = ref("error")
 
-const spriteCreator = computed(() => {
-    //pkmnDataRepository.get
-    return "TODO"
+async function updateCredits(){
+    const creditsList = await pkmnDataRepository.fetchCredits(props.pkmn.pkmnId, props.pkmn.formId, false)
+    if (creditsList == null){
+        spriteCreator.value = "error: failed to fetch credits"
+        return 
+    }
+    
+    for (const credits of creditsList){
+        if (credits.resources.find((v,i,o)=> v == props.pkmn.animation) != -1) {
+            spriteCreator.value = credits.name
+            return
+        }
+    }
+    spriteCreator.value = "error: credits not found"
+}
+
+watch(() => props.pkmn.formId, (newForm, oldForm) => {
+    updateCredits()
 })
-//
+
+watch(() => props.pkmn.animation, (newForm, oldForm) => {
+    updateCredits()
+})
+
+onMounted( async () => {
+    updateCredits()
+})
+
+
 </script>
 
 

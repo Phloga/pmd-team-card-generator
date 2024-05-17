@@ -186,9 +186,10 @@ function onSpriteMouseLeave(){
         <div class="team-card__sprite-area">
             <template v-for="[uid, pkmn] in placedPkmn" :key="uid">
             <div class="pkmn" :style="{'top': pkmn.positionY+'px', 'left': pkmn.positionX+'px'}" @mouseleave="onSpriteMouseLeave" @mouseover="onSpriteMouseOver($event, pkmn.uid)">
-                <div class="pkmn-sprite" draggable="true" @click="openSpritePicker($event, pkmn.uid)" @dragstart="dragStart($event, pkmn.uid)">
+                <!--<div class="pkmn-sprite" draggable="true" @click="openSpritePicker($event, pkmn.uid)" @dragstart="dragStart($event, pkmn.uid)">
                     <AnimatedPkmnSprite :pkmnId="pkmn.pkmnId" :formId="pkmn.formId" :animation="pkmn.animation" :start="pkmn.animationTileX" :direction="pkmn.animationTileY" :shiny="pkmn.shiny" :pixel-size="2"/>
-                </div>
+                </div>-->
+                <AnimatedPkmnSprite class="pkmn-sprite" draggable="true" @click="openSpritePicker($event, pkmn.uid)" @dragstart="dragStart($event, pkmn.uid)" :pkmnId="pkmn.pkmnId" :formId="pkmn.formId" :animation="pkmn.animation" :start="pkmn.animationTileX" :direction="pkmn.animationTileY" :shiny="pkmn.shiny" :pixel-size="2"/>
                 <SpriteInfoBox class="pkmn-info-box" :pkmn="pkmn"></SpriteInfoBox>
             </div>
             </template>
@@ -347,9 +348,8 @@ function onSpriteMouseLeave(){
 
 .pkmn {
     position: absolute;
-    display: flex;
-    flex-flow: row nowrap;
-    align-items: center;
+    display: inline-block;
+
     z-index: 1;
 }
 

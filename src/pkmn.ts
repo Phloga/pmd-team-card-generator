@@ -64,6 +64,7 @@ class PkmnFactory {
     }
 }
 
+
 class PkmnSpritePlacement {
     uid: number
     pkmnId: number
@@ -96,17 +97,21 @@ class PkmnSpritePlacement {
     }
 }
 
+interface CreditsRecord {timestamp: string, name: string, contact: string, resources: string[]}
+
 class PkmnDataRepository {
     pkmnData : any
     pkmnMap: Map<string, any>
     animations: Map<string,any>
-    credits: Map<string, any>
+    spriteCredits: Map<string, Array<CreditsRecord>>
+    portraitCredits: Map<string, Array<CreditsRecord>>
     creditsNames: Map<string, {name: string, contact:string}>
 
     constructor(){
         this.pkmnData = pkmnDataImport
         this.animations = new Map()
-        this.credits = new Map()
+        this.spriteCredits = new Map()
+        this.portraitCredits = new Map()
         this.creditsNames = new Map()
         this.pkmnMap = new Map()
     }
@@ -316,34 +321,36 @@ class PkmnDataRepository {
     }
 
     parseCredits(txt:string){
-        const credits = new Array<{timestamp: string, handle: string}>()
+        const credits = new Array<{timestamp: string, name: string, contact: string, resources: string[]}>()
         let i = 0
         let j = 0
         while ((j = txt.indexOf('\n', i)) !== -1) {
-            const line = txt.substring(i, j).split(' ');
+            const line = txt.substring(i, j).split(/[\s\t]+/);
+            const resources = line[5].split(',')
             i = j + 1;
-            credits.push({timestamp: line[0], handle: line[1]})
+            const creatorInfo = this.creditsNames.get(line[2])
+            const creator = creatorInfo != null ? creatorInfo : {name:line[2], contact:""}
+            credits.push({timestamp: line[0] + line[1], name: creator.name, contact:creator.contact, resources: resources})
         }
         return credits
     }
 
-    async fetchCreditsNames(){
+    async fetchCredits(pkmnId:number, formId:string, portrait:boolean) {
         if (this.creditsNames.size == 0){
             const names = await fetch(pmdSpriteCollabBaseUrl + 'credit_names.txt')
             this.creditsNames = this.parseCreditNames(await names.text())
         }
-        return this.creditsNames
-    }
 
-    async fetchCredits(pkmnId:number, formId:string) {
         const pkmnKey = this.compositeKey(pkmnId, formId)
-        if (!this.credits.has(pkmnKey)){
-            const animRoot = this.formPath(pkmnId,formId,false)
-            const response = await fetch(animRoot + "/credits.txt")
+        const credits = portrait ? this.portraitCredits : this.spriteCredits 
+
+        if (!credits.has(pkmnKey)){
+            const rootPath =  this.formPath(pkmnId,formId,portrait)
+            const response = await fetch(rootPath + "/credits.txt")
             const text = await response.text()
-            this.credits.set(pkmnKey, this.parseCredits(text))
+            credits.set(pkmnKey, this.parseCredits(text))
         }
-        return this.credits.get(pkmnKey)
+        return credits.get(pkmnKey)
     }
 }
 
