@@ -6,14 +6,15 @@ export const spriteConfigLocation = spritesCollabUri + 'sprite_config.json'
 
 import pkmnDataImport from './pkmn-data.json'
 
-//const pmdSpriteCollabBaseUrl = "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/"
-const pmdSpriteCollabBaseUrl = "/SpriteCollab/"
+const pmdSpriteCollabBaseUrl = "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/"
+//const pmdSpriteCollabBaseUrl = "/SpriteCollab/"
 
 const spriteUrl = pmdSpriteCollabBaseUrl + 'sprite/'
 const portraitUrl = pmdSpriteCollabBaseUrl + 'portrait/'
 
-//const spriteCollabPokemonsUrl = "https://raw.githubusercontent.com/PMDCollab/SpriteViewer/main/resources/pokemons.json"
+const useSpriteServer = true
 const spriteCollabPokemonsUrl = "/pokemons.json"
+const spriteServerEndpoint = "https://spriteserver.pmdcollab.org/graphql"
 
 //const creditsPath = pmdSpriteCollabBaseUrl + "credit_names.txt"
 
@@ -31,6 +32,34 @@ function zeroPad(num:number){
 function fallbackAnimation(pkmnId: number, formId:string){
     return {pkmnId: 0 , formId: ""}
 }
+
+async function fetchFormsFromSpriteServer(){
+    const qlQuery = {
+      "operationName":"Pokemon",
+      "variables" : null,
+      "query":`query Pokemon {
+        monster {
+            id
+            forms {
+              path
+              name
+              fullName
+            }
+          }
+        }`
+      }
+  
+    const request = {
+      method: 'POST',
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+      },
+      body: JSON.stringify(qlQuery)
+    }
+    return fetch(spriteServerEndpoint, request)
+  }
+
 
 class PkmnFactory {
     counter: number
@@ -237,22 +266,21 @@ class PkmnDataRepository {
         if (this.pkmnForms.size != 0) {
             return this.pkmnForms
         }
-        const pokemons = await fetch(spriteCollabPokemonsUrl).then((response)=> response.json());
+        let pokemons = () => {
+            if (useSpriteServer){
+                return fetchFormsFromSpriteServer().then((response)=> response.json()).then((body)=> body.data.monster)
+            } else {
+                return fetch(spriteCollabPokemonsUrl).then((response)=> response.json());
+            }
+        }
 
         this.pkmnForms = new Map(
-            pokemons.map((obj: { id: number; forms: any }) => 
+            (await pokemons()).map((obj: { id: number; forms: any }) => 
                 [
                     obj.id, 
                     Object.fromEntries(obj.forms.map((v: { path: string, fullName: string })=> [asFormId(v.path), v]))
                 ])
         );
-        /*
-        for (const pix in pokemons){
-            this.pkmnMap.set(pix, {
-                name : pokemons[pix],
-                forms : pokemons[pix].forms
-            })
-        }*/
         return this.pkmnForms
     }
 

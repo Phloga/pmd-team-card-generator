@@ -1,9 +1,7 @@
 #!/usr/bin/env node
 import fs from 'fs';
 
-const spritesLocation = './SpriteCollab/sprite'
 const pkmnNameTranslationSource = "./pokemon-names/data"
-const pkmnJsonUrl = "https://raw.githubusercontent.com/PMDCollab/SpriteViewer/main/resources/pokemons.json"
 
 
 const spriteServerEndpoint = "https://spriteserver.pmdcollab.org/graphql"
