@@ -17,25 +17,19 @@ const spriteCollabPokemonsUrl = "/pokemons.json"
 
 //const creditsPath = pmdSpriteCollabBaseUrl + "credit_names.txt"
 
+function asFormId(path:string){
+    if (path.length == 0)
+        return ""
+    const numbers = path.split('/').map((val)=>parseInt(val))
+    return numbers.join('-')
+}
 
 function zeroPad(num:number){
     return String(num).padStart(4, '0')
 }
 
 function fallbackAnimation(pkmnId: number, formId:string){
-    const base = formId.substring(0,4);
-    const mods = formId.substring(4);
-    if (mods.length > 0) {
-        return {pkmnId: pkmnId, formId: base+mods.slice(1)}
-    } 
-    else if (formId != "0000"){
-        return {pkmnId: pkmnId, formId: "0000"}
-    }
-    else if (pkmnId != 0) {
-        return {pkmnId: 0, formId: "0000"}
-    } else {
-        return {pkmnId: 0 , formId: null}
-    }
+    return {pkmnId: 0 , formId: ""}
 }
 
 class PkmnFactory {
@@ -89,7 +83,7 @@ class PkmnSpritePlacement {
         this.animationTileX = 0
         this.animationTileY = 0
         this.maxAnimationTileX = 0
-        this.formId = '0000'
+        this.formId = ''
     }
 
     setDirection(dir : number){
@@ -101,7 +95,7 @@ interface CreditsRecord {timestamp: string, name: string, contact: string, resou
 
 class PkmnDataRepository {
     pkmnData : any
-    pkmnMap: Map<string, any>
+    pkmnForms: Map<number, any>
     animations: Map<string,any>
     spriteCredits: Map<string, Array<CreditsRecord>>
     portraitCredits: Map<string, Array<CreditsRecord>>
@@ -113,12 +107,12 @@ class PkmnDataRepository {
         this.spriteCredits = new Map()
         this.portraitCredits = new Map()
         this.creditsNames = new Map()
-        this.pkmnMap = new Map()
+        this.pkmnForms = new Map()
     }
 
     async fetchPkmnIds() {
-        const pkmns = await this.fetchPokemonMap()
-        return Array.from(pkmns.keys()).map((pkmnIx: any) => parseInt(pkmnIx))
+        const pkmns = await this.fetchPokemonForms()
+        return Array.from(pkmns.keys()).map((pkmnId: any) => parseInt(pkmnId))
     }
 
     getLanguages() {
@@ -142,37 +136,21 @@ class PkmnDataRepository {
     }
 
     hasForm(pkmnId:number, formId:string){
-        return this.pkmnMap.get(zeroPad(pkmnId)).forms[formId] != null
-    }
-
-    hasFemaleForm(pkmnId:number, baseFormId:string){
-        return this.hasForm(pkmnId, baseFormId+'f')
-    }
-
-    hasShinyForm(pkmnId:number, baseFormId:string){
-        return this.hasForm(pkmnId, baseFormId+'s')
-    }
-
-    getForm(pkmnId:number, formId:string) : {name: string, path: string}{
-        const form = this.pkmnMap.get(zeroPad(pkmnId)).forms[formId];
-        return {
-            name: form.name,
-            path: form.botPath
-        }
+        return this.pkmnForms.get(pkmnId)[formId] != null
     }
 
     getFormsList(pkmnId:number){
-        const sPkmnId = zeroPad(pkmnId)
-        if (!this.pkmnMap.has(sPkmnId)) {
+        if (!this.pkmnForms.has(pkmnId)) {
             return []
         }
 
-        const forms : Array<[string, {name: string, botPath: string}]> = Object.entries(this.pkmnMap.get(zeroPad(pkmnId)).forms)
+        const forms : Array<[string, {fullName: string, path: string}]> = Object.entries(this.pkmnForms.get(pkmnId))
+        console.log(forms)
         return forms.map(([key,value]) => {
                 return {
                     formId: key,
-                    name: value.name,
-                    path: value.botPath
+                    name: key != "" ? value.fullName : "Normal",
+                    path: value.path
                 }
             }
         )
@@ -180,17 +158,16 @@ class PkmnDataRepository {
 
 
     formPath(pkmnId:number , formId:string, portrait:boolean){
-        const path = this.pkmnMap.get(zeroPad(pkmnId)).forms[formId].botPath
+        const path = zeroPad(pkmnId) + '/' + this.pkmnForms.get(pkmnId)[formId].path + '/'
         //TODO handle missing sprites portraits
 
         if (portrait)
-            return portraitUrl.slice(0, -1) + path
+            return portraitUrl + path
         else
-            return spriteUrl.slice(0, -1) + path
+            return spriteUrl + path
     }
 
     getPortraitPath(pkmnId:number, formId:string, emotion:string) {
-        console.log(formId)
         return this.formPath(pkmnId, formId, true) + emotion + ".png"
     }
 
@@ -252,20 +229,28 @@ class PkmnDataRepository {
         return newAnimationSet
     }
 
-    async fetchPokemonMap() {
-        if (this.pkmnMap.size != 0) {
-            return this.pkmnMap
+    async fetchPokemonForms() {
+        if (this.pkmnForms.size != 0) {
+            return this.pkmnForms
         }
-
         const pokemons = await fetch(spriteCollabPokemonsUrl).then((response)=> response.json());
 
+        this.pkmnForms = new Map(
+            pokemons.map((obj: { id: number; forms: any }) => 
+                [
+                    obj.id, 
+                    Object.fromEntries(obj.forms.map((v: { path: string, fullName: string })=> [asFormId(v.path), v]))
+                ])
+        );
+        console.log(this.pkmnForms)
+        /*
         for (const pix in pokemons){
             this.pkmnMap.set(pix, {
                 name : pokemons[pix],
                 forms : pokemons[pix].forms
             })
-        }
-        return this.pkmnMap
+        }*/
+        return this.pkmnForms
     }
 
     async fetchAnimData(prefPkmnId:number, prefFormId:string){

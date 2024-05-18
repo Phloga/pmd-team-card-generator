@@ -6,7 +6,7 @@ import {pkmnDataRepository} from '../pkmn.ts'
 
 const props = defineProps({
     "pkmnId" : Number, 
-    "formId" : {type: String, default: "0000"},
+    "formId" : {type: String, default: ""},
     "shiny" : {type: Boolean, default: false},
     "animation" : String, 
     "direction" : Number, 
