@@ -77,6 +77,17 @@ function onDragStartHandler(event, pkmnId){
         }
     }
 
+    .search-field {
+        color: var(--color-text);
+        background: var(--color-md-textbox-bg);
+        border: none;
+        font-size: 1rem;
+        position: sticky;
+        top: 1px;
+        width: 100%;
+        z-index: 2;
+    }
+
     .grid-root {
         border: 1px solid var(--color-border);
         display: grid;

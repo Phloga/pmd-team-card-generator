@@ -12,7 +12,7 @@ import * as htmlToImage from 'html-to-image';
 import PMDSkyStartURL from '../assets/card-backgrounds/PMD Sky Start.png'
 import PMDSkyTitleURL from '../assets/card-backgrounds/PMD Sky Title Screen BG.png'
 
-import {pkmnDataRepository} from '../pkmn.ts'
+import {pkmnDataRepository} from '../pkmn'
 
 /*
 const pkmnIds = computed(() => {
@@ -87,7 +87,7 @@ function addBackground(file){
 <template>
     <div class="app-root">
         <BackgroundPicker v-show="backgroundPickerVisible" @close="setBackgroundPickerVisibility(false)" @selected="setBackground" @added="addBackground" :backgrounds="backgrounds"></BackgroundPicker>
-        <TeamCard :background="selectedBackground.url" :width="selectedBackground.width" :height="selectedBackground.height"></TeamCard>
+        <TeamCard :background="selectedBackground.url"></TeamCard>
         <div class="md-frame">
             <div class="accordeon">
                 <div class="accordeon__header">
@@ -120,7 +120,7 @@ function addBackground(file){
 
     .app-root {
         display: flex;
-        flex-flow: column nowrap;
+        flex-flow: row wrap;
         justify-content: space-around;
         align-items: center;
     }
@@ -133,18 +133,7 @@ function addBackground(file){
         outline: var(--color-md-textbox-o1) solid 0.25rem;
         border-radius: 0.5rem;
         margin: 0.25rem;
-        width: 60rem;
-    }
-
-    .pallete_panel {
-        background-color: var(--color-md-textbox-bg);
-        border-width: 0.5rem;
-        border-style: groove ridge ridge groove;
-        border-color: var(--color-md-textbox-i1);
-        outline: var(--color-md-textbox-o1) solid 0.25rem;
-        border-radius: 0.5rem;
-        margin: 0.25rem;
-        width: 60rem;
+        min-width: 20rem;
     }
 
     .accordeon {

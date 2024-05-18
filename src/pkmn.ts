@@ -37,8 +37,9 @@ async function fetchFormsFromSpriteServer(){
     const qlQuery = {
       "operationName":"Pokemon",
       "variables" : null,
-      "query":`query Pokemon {
-        monster {
+      "query":`
+        query Pokemon {
+          monster {
             id
             forms {
               path
@@ -48,7 +49,6 @@ async function fetchFormsFromSpriteServer(){
           }
         }`
       }
-  
     const request = {
       method: 'POST',
       headers: {
@@ -58,6 +58,15 @@ async function fetchFormsFromSpriteServer(){
       body: JSON.stringify(qlQuery)
     }
     return fetch(spriteServerEndpoint, request)
+    /*
+    const request = {
+        method: 'GET',
+        headers: {
+            "Accept": "application/json"
+        }
+      }
+    return fetch(spriteServerEndpoint + '?query=' + encodeURI(qlQuery.query), request)
+    */
   }
 
 

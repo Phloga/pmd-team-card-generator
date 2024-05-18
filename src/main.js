@@ -3,7 +3,7 @@ import './assets/main.css'
 import { createApp } from 'vue'
 import { createI18n } from 'vue-i18n'
 
-import CardEditor from './components/CardEditor.vue'
+import App from './components/App.vue'
 
 
 function reducePkmnNameArray(nameArray){
@@ -34,7 +34,7 @@ const i18n = createI18n({
 
 
 
-const app = createApp(CardEditor)
+const app = createApp(App)
 app.use(i18n)
 app.mount('#app')
 const accordeonNodes = document.querySelectorAll(".accordeon__header")

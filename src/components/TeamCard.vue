@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, reactive, watch } from 'vue';
 import AnimatedPkmnSprite from './AnimatedPkmnSprite.vue'
 import PkmnPortrait from './PkmnPortrait.vue';
 import EmotionPicker from './EmotionPicker.vue'
@@ -11,7 +11,7 @@ import SpriteInfoBox from './SpriteInfoBox.vue';
 import {teamRanks} from '../team'
 import { pkmnFactory } from '@/pkmn';
 
-const props = defineProps(["background", "width", "height"])
+const props = defineProps(["background"])
 const placedPkmn = ref(new Map())
 
 const pickerPkmnUid = ref(0)
@@ -36,14 +36,24 @@ const backgroundImage = ref(null)
 const pixelScaleFactor = ref(2)
 
 const cardDimensions = computed(() => {
+    const tmpImg = document.createElement("img")
+    const scaleFactor = pixelScaleFactor.value
+    tmpImg.src = props.background
+    return {'width': scaleFactor*tmpImg.naturalWidth + 'px', 'height': scaleFactor*tmpImg.naturalHeight + 'px'}
+})
+
+
+/*
+const cardDimensions = computed(() => {
     if (backgroundImage.value){
         const scaleFactor = pixelScaleFactor.value
+        console.log("bg native size:" + backgroundImage.value.naturalWidth + ',' + backgroundImage.value.naturalHeight)
         return {'width': scaleFactor*backgroundImage.value.naturalWidth + 'px', 'height': scaleFactor*backgroundImage.value.naturalHeight + 'px'}
     } else {
         return {}
     }
     //return {'width': pixelScaleFactor*props.width + 'px', 'height': pixelScaleFactor*props.height + 'px'}
-})
+})*/
 
 function dragoverHandler(event){
 	event.preventDefault();

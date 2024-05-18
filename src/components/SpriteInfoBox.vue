@@ -3,7 +3,7 @@ import { PkmnSpritePlacement, pkmnDataRepository } from '@/pkmn';
 import { ref, onMounted, watch } from 'vue';
 
 const props = defineProps({
-    "pkmn" : {type:PkmnSpritePlacement, required:true}
+    "pkmn" : {required:true}
 })
 
 const spriteCreator = ref("error")
