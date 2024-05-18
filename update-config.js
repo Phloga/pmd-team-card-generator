@@ -12,18 +12,6 @@ const spriteConfigImport = await import('./SpriteCollab/sprite_config.json' , {
     assert: { type: "json" },
 });
 
-
-//import spriteConfigImport from './public/SpriteCollab/sprite_config.json' with {type: 'json'}
-
-let spritesDir = await fs.promises.readdir(spritesLocation)
-
-/*
-const spriteData = spritesDir.map( value => {return {
-  id : parseInt(value),
-  forms: null
-}})
-*/
-
 async function querySpecific(pkmnId){
   const qlQuery = {
     "operationName":"Pokemon",
@@ -75,27 +63,15 @@ async function queryAll(){
 //const pokemon = new Map((await queryAll()).data.monster.map((obj) => [obj.id, obj.forms]));
 
 fs.promises.writeFile('public/pokemons.json',JSON.stringify((await queryAll()).data.monster))
-/*
-for (const sprite of spriteData){
-  sprite.forms = pokemon.get(sprite.id)
-}
-*/
 
 const languagesDir = await fs.promises.readdir(pkmnNameTranslationSource)
 
 const config = {
     spriteConfig: spriteConfigImport.default,
-    //sprites: Array.from(spriteData),
     languages: languagesDir.map(lang => lang.slice(0,lang.length-5))
 }
 
 await fs.promises.writeFile("./src/pkmn-data.json", JSON.stringify(config))
 
 const promises = languagesDir.map((file) => fs.promises.copyFile(pkmnNameTranslationSource + '/' + file, "./src/assets/pkmn-names/" + file))
-
-/*
-fetch(pkmnJsonUrl).then((response) => {
-  return fs.promises.writeFile('public/pokemons.json',response.body)
-})
-*/
 
