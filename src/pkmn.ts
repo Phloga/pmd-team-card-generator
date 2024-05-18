@@ -139,6 +139,10 @@ class PkmnDataRepository {
         return this.pkmnForms.get(pkmnId)[formId] != null
     }
 
+    getForm(pkmnId:number, formId:string){
+        return this.pkmnForms.get(pkmnId)[formId]
+    }
+
     getFormsList(pkmnId:number){
         if (!this.pkmnForms.has(pkmnId)) {
             return []
@@ -242,7 +246,6 @@ class PkmnDataRepository {
                     Object.fromEntries(obj.forms.map((v: { path: string, fullName: string })=> [asFormId(v.path), v]))
                 ])
         );
-        console.log(this.pkmnForms)
         /*
         for (const pix in pokemons){
             this.pkmnMap.set(pix, {
