@@ -42,6 +42,7 @@ const selectedBackground = ref(backgrounds.value[0])
 
 const backgroundPickerVisible = ref(false)
 
+const bgPixelScale = ref(3)
 
 function setBackgroundPickerVisibility(visible){
     backgroundPickerVisible.value = visible
@@ -85,45 +86,40 @@ function addBackground(file){
 
 
 <template>
-    <div class="app-root">
-        <BackgroundPicker v-show="backgroundPickerVisible" @close="setBackgroundPickerVisibility(false)" @selected="setBackground" @added="addBackground" :backgrounds="backgrounds"></BackgroundPicker>
-        <TeamCard :background="selectedBackground.url"></TeamCard>
-        <div class="md-frame">
-            <div class="accordeon">
-                <div class="accordeon__header">
-                    <button class="no-background">
-                        <i class="icon-accordeon"></i>   
-                    </button>
-                    <div>General</div>
-                </div>
-                <div class="accordeon__body">
-                    <button @click="setBackgroundPickerVisibility(true)">Pick Background</button>
-                    <button @click="generateCardAsPng">Save</button>
+    <BackgroundPicker v-show="backgroundPickerVisible" @close="setBackgroundPickerVisibility(false)" @selected="setBackground" @added="addBackground" :backgrounds="backgrounds"></BackgroundPicker>
+    <TeamCard :background="selectedBackground.url" :backgroundScale="bgPixelScale"></TeamCard>
+    <div class="md-frame">
+        <div class="accordeon accordeon--open">
+            <div class="accordeon__header">
+                <button class="no-background">
+                    <i class="icon-accordeon"></i>   
+                </button>
+                <div class="heading text-right">General</div>
+            </div>
+            <div class="accordeon__body">
+                <button @click="setBackgroundPickerVisibility(true)">Pick Background</button>
+                <button @click="generateCardAsPng">Save</button>
+                <div class="labeled-field">
+                    <div>Background Pixel Scale</div>
+                    <input type="number" min="0.1" step="0.1" v-model="bgPixelScale">
                 </div>
             </div>
-            <div class="accordeon">
-                <div class="accordeon__header">
-                    <button class="no-background">
-                    <i class="icon-accordeon"></i>   
-                    </button>
-                    <div>Pokemon</div>
-                </div>
-                <div class="accordeon__body accordeon__body--scrollable">
-                    <SearchablePkmnGrid :pkmnList="pkmnIds" v-model="pkmnSearchString"></SearchablePkmnGrid>
-                </div>
+        </div>
+        <div class="accordeon">
+            <div class="accordeon__header">
+                <button class="no-background">
+                <i class="icon-accordeon"></i>
+                </button>
+                <div class="heading text-right">Pokemon</div>
+            </div>
+            <div class="accordeon__body accordeon__body--scrollable">
+                <SearchablePkmnGrid :pkmnList="pkmnIds" v-model="pkmnSearchString"></SearchablePkmnGrid>
             </div>
         </div>
     </div>
 </template>
 
 <style>
-
-    .app-root {
-        display: flex;
-        flex-flow: row wrap;
-        justify-content: space-around;
-        align-items: center;
-    }
 
     .md-frame {
         background-color: var(--color-md-textbox-bg);
@@ -132,8 +128,8 @@ function addBackground(file){
         border-color: var(--color-md-textbox-i1);
         outline: var(--color-md-textbox-o1) solid 0.25rem;
         border-radius: 0.5rem;
-        margin: 0.25rem;
-        min-width: 20rem;
+        min-width: 16rem;
+        max-width: 28rem;
     }
 
     .accordeon {
@@ -143,6 +139,8 @@ function addBackground(file){
     .accordeon .accordeon__header{
         display: flex;
         flex-flow: row nowrap;
+        border: 2px solid var(--color-md-textbox-bg);
+        outline-offset: -2px;
     }
 
     .accordeon .accordeon__body{
@@ -186,6 +184,20 @@ function addBackground(file){
 
     button:active{
         background-color: var(--color-button-bg-active);
+    }
+
+    .labeled-field {
+        display: flex;
+        flex-flow: row wrap;
+        justify-content: flex-start;
+    }
+
+    .labeled-field input {
+        color: var(--color-text);
+        background: var(--color-md-textbox-bg);
+        border: none;
+        font-size: 1rem;
+        margin-left: 1rem;
     }
 
     .no-background {

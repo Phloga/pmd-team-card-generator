@@ -11,7 +11,7 @@ import SpriteInfoBox from './SpriteInfoBox.vue';
 import {teamRanks} from '../team'
 import { pkmnFactory } from '@/pkmn';
 
-const props = defineProps(["background"])
+const props = defineProps(["background", "backgroundScale"])
 const placedPkmn = ref(new Map())
 
 const pickerPkmnUid = ref(0)
@@ -33,11 +33,9 @@ const teamCard = ref(null)
 
 const backgroundImage = ref(null)
 
-const pixelScaleFactor = ref(2)
-
 const cardDimensions = computed(() => {
     const tmpImg = document.createElement("img")
-    const scaleFactor = pixelScaleFactor.value
+    const scaleFactor = props.backgroundScale
     tmpImg.src = props.background
     return {'width': scaleFactor*tmpImg.naturalWidth + 'px', 'height': scaleFactor*tmpImg.naturalHeight + 'px'}
 })
@@ -122,12 +120,6 @@ function openRankPicker(event) {
     pickerPkmnUid.value = null
     const rect = event.target.getBoundingClientRect();
     pickerPosition.value = [rect.left, rect.top]
-}
-
-
-
-function setPixelScale(pickScaleEvent){
-    pixelScaleFactor.value = pickScaleEvent.scale
 }
 
 function onPickRank(pickedRank) {
@@ -250,10 +242,11 @@ function onSpriteMouseLeave(){
     width: 1rem;
 }
 
-.team-card {
+#teamCard {
     position: relative;
-    margin: 0;
     padding: 0;
+    flex-grow: 0;
+    flex-shrink: 0;
 }
 
 .team-card__background {
