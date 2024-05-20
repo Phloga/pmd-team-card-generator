@@ -1,6 +1,3 @@
 [submodule "pokemon-names"]
 	path = pokemon-names
 	url = https://github.com/sindresorhus/pokemon.git
-[submodule "SpriteCollab"]
-	path = public/SpriteCollab
-	url = https://github.com/PMDCollab/SpriteCollab.git
