@@ -6,7 +6,7 @@ const pkmnNameTranslationSource = "./pokemon-names/data"
 
 const spriteServerEndpoint = "https://spriteserver.pmdcollab.org/graphql"
 
-const spriteConfigImport = await import('./SpriteCollab/sprite_config.json' , {
+const spriteConfigImport = await import('./public/SpriteCollab/sprite_config.json' , {
     assert: { type: "json" },
 });
 
