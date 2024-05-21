@@ -18,12 +18,9 @@ const pickerPkmnUid = ref(0)
 const pickerType = ref("")
 const pickerPosition = ref([0,0])
 
-const pointerIsOverInfoBox = ref(false)
 const pointerIsOverSprite = ref(false)
 const infoBoxPosition = ref([0,0])
 const infoBoxPkmn = ref(pkmnFactory.placeholderPkmn())
-
-const infoBoxVisiblity = computed (() => pickerType.value =='' && (pointerIsOverInfoBox.value || pointerIsOverSprite.value))
 
 const teamName = ref("")
 
@@ -33,25 +30,23 @@ const teamCard = ref(null)
 
 const backgroundImage = ref(null)
 
-const cardDimensions = computed(() => {
+const cardDimensions = ref({'width': 0 + 'px', 'height': 0 + 'px'})
+
+function updateCardSize() {
     const tmpImg = document.createElement("img")
     const scaleFactor = props.backgroundScale
     tmpImg.src = props.background
-    return {'width': scaleFactor*tmpImg.naturalWidth + 'px', 'height': scaleFactor*tmpImg.naturalHeight + 'px'}
+    tmpImg.decode().then(()=> {
+        cardDimensions.value = {'width': scaleFactor*tmpImg.naturalWidth + 'px', 'height': scaleFactor*tmpImg.naturalHeight + 'px'}
+    })
+}
+
+watch(()=> props.background,(newBackground) => {
+    updateCardSize()
 })
-
-
-/*
-const cardDimensions = computed(() => {
-    if (backgroundImage.value){
-        const scaleFactor = pixelScaleFactor.value
-        console.log("bg native size:" + backgroundImage.value.naturalWidth + ',' + backgroundImage.value.naturalHeight)
-        return {'width': scaleFactor*backgroundImage.value.naturalWidth + 'px', 'height': scaleFactor*backgroundImage.value.naturalHeight + 'px'}
-    } else {
-        return {}
-    }
-    //return {'width': pixelScaleFactor*props.width + 'px', 'height': pixelScaleFactor*props.height + 'px'}
-})*/
+watch(()=> props.backgroundScale,(newScale) => {
+    updateCardSize()
+})
 
 function dragoverHandler(event){
 	event.preventDefault();
@@ -168,13 +163,6 @@ function onSpriteMouseOver(event, pkmnUid){
     infoBoxPkmn.value = placedPkmn.value.get(pkmnUid)
 }
 
-function onInfoBoxMouseOver(){
-    pointerIsOverInfoBox.value = true
-}
-
-function onInfoBoxMouseLeave(){
-    pointerIsOverInfoBox.value = false
-}
 
 function onSpriteMouseLeave(){
     pointerIsOverSprite.value = false
@@ -184,7 +172,7 @@ function onSpriteMouseLeave(){
 
 <template>
     <div id="teamCard" ref="teamCard" @dragover="dragoverHandler" @drop="dropHandler" @dragleave="dragLeaveHandler" class="team-card" :style="cardDimensions">
-        <img ref="backgroundImage" :src="background" class="team-card__background">
+        <img ref="backgroundImage" :src="background" class="team-card__background" @load="updateCardSize">
         <div class="team-card__sprite-area">
             <template v-for="[uid, pkmn] in placedPkmn" :key="uid">
             <div class="pkmn" :style="{'top': pkmn.positionY+'px', 'left': pkmn.positionX+'px'}" @mouseleave="onSpriteMouseLeave" @mouseover="onSpriteMouseOver($event, pkmn.uid)">

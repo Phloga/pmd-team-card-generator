@@ -38,11 +38,11 @@ const backgrounds = ref([
         }
     ])
 
-const selectedBackground = ref(backgrounds.value[0])
+const selectedBackground = ref(backgrounds.value[1])
 
 const backgroundPickerVisible = ref(false)
 
-const bgPixelScale = ref(3)
+const bgPixelScale = ref(2)
 
 function setBackgroundPickerVisibility(visible){
     backgroundPickerVisible.value = visible
