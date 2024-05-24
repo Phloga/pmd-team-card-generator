@@ -4,7 +4,7 @@ import AnimatedPkmnSprite from './AnimatedPkmnSprite.vue'
 import PkmnPortrait from './PkmnPortrait.vue';
 import EmotionPicker from './EmotionPicker.vue'
 import AnimationPicker from './AnimationPicker.vue';
-import ExplorationTeamRank from './ExplorationTeamRank.vue';
+import TeamRank from './TeamRank.vue';
 import RankPicker from './RankPicker.vue';
 import FormPicker from './FormPicker.vue';
 import SpriteInfoBox from './SpriteInfoBox.vue';
@@ -195,11 +195,15 @@ function onSpriteMouseLeave(){
                 </div>
             </div>
         <div class="team-card__info">
-            <div class="text-right pmd-font">Team Name</div>
-            <input v-model="teamName" class="pmd-font text-right">
+            <label for="team-name" class="text-right pmd-font">
+                <div class="text-right">
+                    Team Name
+                </div>
+            </label>
+            <input id="team-name" v-model="teamName" class="pmd-font text-right">
         </div>
         <div class="team-card__rank">
-            <ExplorationTeamRank :name="teamRank.name" :image="teamRank.image" @click="openRankPicker($event)"></ExplorationTeamRank>
+            <TeamRank :name="teamRank.name" :image="teamRank.image" @click="openRankPicker($event)"></TeamRank>
         </div>
     </div>
     <div v-show="pickerType != ''" @click="closeActivePicker()" class="background-overlay"></div>
@@ -267,9 +271,10 @@ function onSpriteMouseLeave(){
 }
 
 .team-card__info input {
-    border: none;
-    background: rgb(0,0,0,25%);
     font-size: 1.5rem;
+    background: rgb(0,0,0,25%);
+    border: none;
+    width: 8em;
 }
 
 .background-overlay{

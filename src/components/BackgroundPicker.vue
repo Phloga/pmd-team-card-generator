@@ -64,7 +64,7 @@ function addBackgrounds(event) {
     display: flex;
     padding: 2rem;
     flex-flow: column nowrap;
-    z-index: 2;
+    z-index: 3;
     background-color: var(--color-md-textbox-bg);
 }
 

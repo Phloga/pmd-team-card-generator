@@ -98,7 +98,7 @@ function addBackground(file){
             </div>
             <div class="accordeon__body">
                 <button @click="setBackgroundPickerVisibility(true)">Pick Background</button>
-                <button @click="generateCardAsPng">Save</button>
+                <button @click="generateCardAsPng">Export</button>
                 <div class="labeled-field">
                     <div>Background Pixel Scale</div>
                     <input type="number" min="0.1" step="0.1" v-model="bgPixelScale">
