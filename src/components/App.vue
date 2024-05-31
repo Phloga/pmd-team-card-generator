@@ -54,9 +54,12 @@ function setBackground(bg){
 }
 
 function generateCardAsPng(event){
-    htmlToImage.toBlob(document.getElementById('teamCard')).then(
+    const teamCardRef = document.getElementById('teamCard')
+    teamCardRef.classList.toggle("active-export")
+    htmlToImage.toBlob(teamCardRef, {pixelRatio:1}).then(
         function (blob) {
             var blobUrl = URL.createObjectURL(blob);
+            document.getElementById('teamCard').classList.toggle("active-export")
             var link = document.createElement("a"); // Or maybe get it from the current document
             link.href = blobUrl;
             link.download = "team.png";
@@ -92,7 +95,7 @@ function addBackground(file){
         <div class="accordeon accordeon--open">
             <div class="accordeon__header">
                 <button class="no-background">
-                    <i class="icon-accordeon"></i>   
+                    <i class="icon-accordeon"></i>
                 </button>
                 <div class="heading text-right">General</div>
             </div>

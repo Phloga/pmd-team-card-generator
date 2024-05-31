@@ -109,6 +109,7 @@ class PkmnSpritePlacement {
     animationTileX: number
     animationTileY: number
     maxAnimationTileX: number
+    visible: boolean
 
     constructor(uid : number,pkmnId : number, name : string, animation : string, emotion : string, positionX : number, positionY : number){
         this.uid = uid
@@ -122,6 +123,7 @@ class PkmnSpritePlacement {
         this.animationTileY = 0
         this.maxAnimationTileX = 0
         this.formId = ''
+        this.visible = true
     }
 
     setDirection(dir : number){

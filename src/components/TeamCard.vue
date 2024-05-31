@@ -156,13 +156,17 @@ function removeTeamMember(uid){
     placedPkmn.value.delete(uid)
 }
 
+function toggleTeamMemberSpriteVisibility(event, uid) {
+    placedPkmn.value.get(uid).visible ^= true
+    event.currentTarget.classList.toggle("slash")
+}
+
 function onSpriteMouseOver(event, pkmnUid){
     const rect = event.currentTarget.getBoundingClientRect();
     infoBoxPosition.value = [rect.right + window.scrollX , rect.top + scrollY ]
     pointerIsOverSprite.value = true
     infoBoxPkmn.value = placedPkmn.value.get(pkmnUid)
 }
-
 
 function onSpriteMouseLeave(){
     pointerIsOverSprite.value = false
@@ -175,7 +179,7 @@ function onSpriteMouseLeave(){
         <img ref="backgroundImage" :src="background" class="team-card__background" @load="updateCardSize">
         <div class="team-card__sprite-area">
             <template v-for="[uid, pkmn] in placedPkmn" :key="uid">
-            <div class="pkmn" :style="{'top': pkmn.positionY+'px', 'left': pkmn.positionX+'px'}" @mouseleave="onSpriteMouseLeave" @mouseover="onSpriteMouseOver($event, pkmn.uid)">
+            <div v-show="pkmn.visible" class="pkmn" :style="{'top': pkmn.positionY+'px', 'left': pkmn.positionX+'px'}" @mouseleave="onSpriteMouseLeave" @mouseover="onSpriteMouseOver($event, pkmn.uid)">
                 <!--<div class="pkmn-sprite" draggable="true" @click="openSpritePicker($event, pkmn.uid)" @dragstart="dragStart($event, pkmn.uid)">
                     <AnimatedPkmnSprite :pkmnId="pkmn.pkmnId" :formId="pkmn.formId" :animation="pkmn.animation" :start="pkmn.animationTileX" :direction="pkmn.animationTileY" :shiny="pkmn.shiny" :pixel-size="2"/>
                 </div>-->
@@ -190,8 +194,9 @@ function onSpriteMouseLeave(){
                         <PkmnPortrait :pkmnId="pkmn.pkmnId" :formId="pkmn.formId" :emotion="pkmn.emotion" :shiny="pkmn.shiny"></PkmnPortrait>
                     </button>
                     <input v-model="pkmn.name">
-                    <i class="icon-shiny team-member__toggle_shiny" @click="openPkmnSpecificPicker($event, uid, 'form')"></i>
-                    <i class="icon-xcross team-member__remove" @click="removeTeamMember(uid)"></i>
+                    <i class="icon-shiny team-member__toggle_shiny control-icon" @click="openPkmnSpecificPicker($event, uid, 'form')"></i>
+                    <i class="icon-xcross team-member__remove control-icon" @click="removeTeamMember(uid)"></i>
+                    <i class="icon-eye team-member__toggle_visibility control-icon" @click="toggleTeamMemberSpriteVisibility($event,uid)"></i>
                 </div>
             </div>
         <div class="team-card__info">
@@ -214,6 +219,26 @@ function onSpriteMouseLeave(){
 </template>
 
 <style>
+
+.icon-eye {
+    mask-image: url('../assets/icon/eye-solid.svg');
+    background-color: var(--color-text);
+    mask-repeat: no-repeat;
+    mask-size: 100% auto;
+    display: block;
+    height: 1rem;
+    width: 1rem;
+}
+
+.icon-eye.slash {
+    mask-image: url('../assets/icon/eye-slash-solid.svg');
+    background-color: var(--color-text);
+    mask-repeat: no-repeat;
+    mask-size: 100% auto;
+    display: block;
+    height: 1rem;
+    width: 1rem;
+}
 
 .icon-shiny {
     mask-image: url('../assets/icon/shiny.svg');
@@ -333,14 +358,20 @@ function onSpriteMouseLeave(){
     top: 0; 
 }
 
-.team-member__toggle_shiny:hover {
+.team-member__toggle_visibility {
+    position: absolute;
+    right: 2rem;
+    top: 0; 
+}
+
+.control-icon:hover {
     background-color: red;
 }
 
-
-.team-member__remove:hover {
-    background-color: red;
+.active-export .control-icon{
+    visibility: hidden;
 }
+
 
 .pkmn {
     position: absolute;
